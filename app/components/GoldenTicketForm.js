@@ -62,7 +62,8 @@ export default function GoldenTicketForm() {
     });
   }, [particleCount]);
 
-  const sweetImages = ["/test.svg", "/test.svg", "/test.svg"];
+  // Weihnachtliche Bilder für Animation
+  const christmasImages = ["🎄", "❄️", "🎁", "⭐", "🔔", "🎅"];
 
   const getUTMParameter = (param) => {
     if (typeof window === "undefined") return null;
@@ -150,32 +151,51 @@ export default function GoldenTicketForm() {
   // Success Screen
   if (step === "done") {
     return (
-      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-100 px-4">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center max-w-lg mx-auto">
-          <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-7xl mb-6">🎉</motion.div>
-          <h1 className="text-4xl md:text-6xl font-black mb-6">
-            <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">TEILNAHME BESTÄTIGT!</span>
+      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-green-50 to-red-50 px-4">
+        {/* Weihnachtliche Schneeflocken Animation */}
+        {!prefersReducedMotion && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {Array.from({ length: window.innerWidth < 768 ? 10 : 20 }).map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-3xl md:text-4xl"
+                initial={{ top: -50, left: `${Math.random() * 100}%` }}
+                animate={{ top: "110vh", rotate: 360 }}
+                transition={{ duration: 8 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 5 }}
+              >
+                ❄️
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center max-w-lg mx-auto relative z-10 px-4">
+          <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-5xl md:text-7xl mb-4 md:mb-6">🎄🎁</motion.div>
+          <h1 className="text-3xl md:text-4xl lg:text-6xl font-black mb-4 md:mb-6 px-2">
+            <span className="bg-gradient-to-r from-red-600 via-green-600 to-red-600 bg-clip-text text-transparent">TEILNAHME BESTÄTIGT!</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 mb-6">Dein Code <strong>{ticketCode}</strong> wurde erfolgreich registriert! 🎫</p>
-          <div className="bg-white/90 backdrop-blur-sm p-5 rounded-xl shadow-lg space-y-3">
-            <p className="text-base text-gray-600">
+          <p className="text-lg md:text-xl lg:text-2xl text-gray-700 mb-4 md:mb-6 px-2">
+            Dein Code <strong className="text-red-600 text-xl md:text-2xl">{ticketCode}</strong> wurde erfolgreich registriert! 🎫✨
+          </p>
+          <div className="bg-white/90 backdrop-blur-sm p-4 md:p-5 rounded-xl shadow-lg border-2 border-red-200 space-y-3">
+            <p className="text-sm md:text-base text-gray-600">
               {newsletterOptIn
                 ? "📧 Bitte bestätige deine Newsletter-Anmeldung in der E-Mail (Double-Opt-In)."
                 : "✅ Deine Teilnahme wurde gespeichert!"}
             </p>
-            <p className="text-sm text-gray-500">
-              Der Gewinner wird nach Ende des Teilnahmezeitraums (24.12.2025) per E-Mail benachrichtigt.
+            <p className="text-xs md:text-sm text-gray-500">
+              🎅 Der Gewinner wird nach Ende des Teilnahmezeitraums (24.12.2025) per E-Mail benachrichtigt.
             </p>
             {newsletterOptIn && (
-              <p className="text-sm text-gray-500">Falls keine E-Mail kommt: Spam-Ordner prüfen.</p>
+              <p className="text-xs md:text-sm text-gray-500">Falls keine E-Mail kommt: Spam-Ordner prüfen.</p>
             )}
           </div>
 
-          <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <p className="text-xs text-gray-600 leading-relaxed">
-              <strong>Teilnahmezeitraum:</strong> 01.12.–24.12.2025 bis 23:59 MEZ · Teilnahme ab 18 Jahren, DE/AT/CH · Keine Kaufpflicht – kostenlose Teilnahme möglich ·
+          <div className="mt-6 md:mt-8 bg-gradient-to-r from-red-50 to-green-50 border-2 border-red-300 rounded-xl p-3 md:p-4 shadow-lg">
+            <p className="text-[10px] md:text-xs text-gray-700 leading-relaxed">
+              🎄 <strong>Teilnahmezeitraum:</strong> 01.12.–24.12.2025 bis 23:59 MEZ · Teilnahme ab 18 Jahren, DE/AT/CH · Keine Kaufpflicht – kostenlose Teilnahme möglich ·
               Veranstalter: Venture One Group GmbH, Wuppertal.
-              <a href="/teilnahmebedingungen" target="_blank" className="underline ml-1">Teilnahmebedingungen</a> ·
+              <a href="/teilnahmebedingungen" target="_blank" className="underline ml-1 text-red-700 font-semibold">Teilnahmebedingungen</a> ·
               Gewinne nicht übertragbar, keine Barauszahlung · Der Rechtsweg ist ausgeschlossen.
             </p>
           </div>
@@ -185,7 +205,8 @@ export default function GoldenTicketForm() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-100 overflow-hidden px-4 py-8">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-green-50 to-red-50 overflow-hidden px-4 py-8">
+      {/* Weihnachtliche Schneeflocken & Dekoration Animation */}
       {!prefersReducedMotion && (
         <div className="absolute inset-0 pointer-events-none">
           {seeds.map((s, i) => (
@@ -193,9 +214,9 @@ export default function GoldenTicketForm() {
               animate={{ y: [-100, vh + 100], x: [0, s.xDrift], rotate: [0, 360] }}
               transition={{ duration: s.duration, repeat: Infinity, ease: "linear", delay: s.delay }}
               style={{ left: `${s.leftPct}%`, top: "-100px" }}>
-              <img src={sweetImages[i % sweetImages.length]} alt="Süßigkeit"
-                   className="w-24 h-24 md:w-32 md:h-32 opacity-70 object-cover rounded-lg" loading="lazy"
-                   onError={(e) => (e.target.style.display = "none")} />
+              <div className="text-5xl opacity-80">
+                {christmasImages[i % christmasImages.length]}
+              </div>
             </motion.div>
           ))}
         </div>
@@ -215,14 +236,17 @@ export default function GoldenTicketForm() {
           <div className="space-y-4">
             <motion.h1 initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
               className="text-3xl md:text-5xl lg:text-6xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">GOLDEN TICKET</span><br />
-              <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 bg-clip-text text-transparent">GEWINNSPIEL 🎫</span>
+              <span className="bg-gradient-to-r from-red-600 via-green-600 to-red-600 bg-clip-text text-transparent">🎄 WEIHNACHTS</span><br />
+              <span className="bg-gradient-to-r from-green-600 via-red-600 to-green-600 bg-clip-text text-transparent">RUBBELLOS 🎁</span>
             </motion.h1>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="space-y-2 max-w-3xl mx-auto">
               <p className="text-lg md:text-xl text-gray-800 font-bold leading-relaxed">
-                Gib deinen 8-stelligen Code ein und <span className="text-amber-600">erfahre welche Gewinne hinter deinem Rubbellos stecken</span>
+                Gib deinen 8-stelligen Code ein und <span className="text-red-600">🎅 erfahre welche Gewinne hinter deinem Rubbellos stecken ✨</span>
               </p>
+              <div className="inline-block bg-gradient-to-r from-red-500 to-green-500 text-white px-6 py-2 rounded-full shadow-lg">
+                <span className="font-bold text-base">🎄 Adventskalender-Gewinnspiel 2024 🎁</span>
+              </div>
             </motion.div>
           </div>
 
@@ -233,32 +257,54 @@ export default function GoldenTicketForm() {
               {/* CODE STEP */}
               {step === "code" && (
                 <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}>
-                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 drop-shadow-sm">🎫 Dein Gewinncode</h3>
+                  <div className="text-center mb-6">
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="text-5xl md:text-6xl mb-4"
+                    >
+                      🎫
+                    </motion.div>
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 drop-shadow-sm px-2">
+                      🎄 Rubbellos einlösen
+                    </h3>
+                    <p className="text-xs md:text-sm text-gray-700 px-4">Kratze die silberne Fläche frei und gib den Code ein</p>
+                  </div>
 
                   <form onSubmit={handleCodeSubmit} className="space-y-4">
                     <div>
-                      <div className="relative">
-                        <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-6 h-6" />
-                        <input
-                          type="text"
-                          placeholder="8-stelliger Code (z.B. ABC12345)"
-                          value={ticketCode}
-                          onChange={(e) => setTicketCode(e.target.value.toUpperCase())}
-                          maxLength={8}
-                          className="w-full pl-14 pr-6 py-5 text-xl font-bold text-center text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-500 placeholder:font-normal tracking-widest"
-                        />
+                      {/* Rubbellos-Style Code-Eingabe */}
+                      <div className="relative bg-gradient-to-br from-gray-300 via-gray-200 to-gray-300 p-4 md:p-6 rounded-2xl shadow-2xl border-2 md:border-4 border-gray-400">
+                        <div className="absolute top-1 md:top-2 left-1 md:left-2 text-[8px] md:text-xs font-bold text-gray-600">GOLDEN TICKET</div>
+                        <div className="absolute top-1 md:top-2 right-1 md:right-2 text-[8px] md:text-xs font-bold text-gray-600">★ XMAS 2024</div>
+
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 md:p-4 border-2 border-dashed border-red-400 mt-3 md:mt-0">
+                          <Ticket className="mx-auto text-red-600 w-6 h-6 md:w-8 md:h-8 mb-2" />
+                          <input
+                            type="text"
+                            placeholder="????????"
+                            value={ticketCode}
+                            onChange={(e) => setTicketCode(e.target.value.toUpperCase())}
+                            maxLength={8}
+                            className="w-full px-2 md:px-4 py-3 md:py-4 text-xl md:text-2xl lg:text-3xl font-black text-center text-red-600 bg-gradient-to-r from-yellow-50 to-red-50 border-2 md:border-4 border-red-500 rounded-xl focus:border-green-500 focus:ring-2 md:focus:ring-4 focus:ring-green-300 focus:outline-none placeholder:text-gray-400 placeholder:font-bold tracking-[0.3em] md:tracking-[0.5em] shadow-inner"
+                          />
+                          <p className="text-[10px] md:text-xs text-gray-600 mt-2 font-semibold px-2">8-stelliger Code (Groß-/Kleinschreibung egal)</p>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-600 mt-2">Bitte gib den 8-stelligen Code von deinem Rubbellos ein</p>
                     </div>
 
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-700 transition-all flex items-center justify-center gap-3 text-base"
+                      className="w-full bg-gradient-to-r from-red-600 via-green-600 to-red-600 text-white font-black py-4 md:py-5 px-4 md:px-6 rounded-xl shadow-2xl hover:shadow-green-500/50 transition-all flex items-center justify-center gap-2 md:gap-3 text-base md:text-lg border-2 border-white"
                     >
-                      Code einlösen <ChevronRight className="w-5 h-5" />
+                      <span className="hidden sm:inline">🎁</span> Code jetzt einlösen! <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                     </motion.button>
+
+                    <p className="text-[10px] md:text-xs text-center text-gray-600 bg-white/50 p-2 md:p-3 rounded-lg leading-relaxed">
+                      🎅 Teilnahme vom 01.12. - 24.12.2025 • Kostenlos & ohne Kaufpflicht
+                    </p>
                   </form>
                 </motion.div>
               )}
@@ -267,11 +313,17 @@ export default function GoldenTicketForm() {
               {step === "contact" && (
                 <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}>
                   <div className="text-center mb-6">
-                    <div className="text-4xl mb-3">✨</div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2 drop-shadow-sm">Fast geschafft!</h3>
-                    <p className="text-gray-700 drop-shadow-sm">Vervollständige deine Teilnahme mit deinen Kontaktdaten</p>
-                    <div className="inline-block bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 mt-3">
-                      <p className="text-sm font-mono font-bold text-amber-900">Code: {ticketCode}</p>
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="text-4xl md:text-5xl mb-3"
+                    >
+                      🎅🎄
+                    </motion.div>
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 drop-shadow-sm px-2">Fast geschafft!</h3>
+                    <p className="text-sm md:text-base text-gray-700 drop-shadow-sm px-4">Vervollständige deine Teilnahme mit deinen Kontaktdaten</p>
+                    <div className="inline-block bg-gradient-to-r from-red-100 to-green-100 border-2 border-red-400 rounded-lg px-4 md:px-6 py-2 md:py-3 mt-3 shadow-lg">
+                      <p className="text-xs md:text-sm font-mono font-black text-red-700">🎫 Code: {ticketCode}</p>
                     </div>
                   </div>
 
@@ -284,7 +336,7 @@ export default function GoldenTicketForm() {
                           type="text"
                           placeholder="Dein Vorname *"
                           {...contactForm.register("firstName", { required: "Vorname ist erforderlich", minLength: { value: 2, message: "Mindestens 2 Zeichen" } })}
-                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-600"
+                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none placeholder:text-gray-600"
                         />
                       </div>
                       {contactForm.formState.errors.firstName && <p className="text-red-600 text-sm mt-2 text-left font-medium">{contactForm.formState.errors.firstName.message}</p>}
@@ -298,7 +350,7 @@ export default function GoldenTicketForm() {
                           type="text"
                           placeholder="Dein Nachname *"
                           {...contactForm.register("lastName", { required: "Nachname ist erforderlich", minLength: { value: 2, message: "Mindestens 2 Zeichen" } })}
-                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-600"
+                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none placeholder:text-gray-600"
                         />
                       </div>
                       {contactForm.formState.errors.lastName && <p className="text-red-600 text-sm mt-2 text-left font-medium">{contactForm.formState.errors.lastName.message}</p>}
@@ -315,7 +367,7 @@ export default function GoldenTicketForm() {
                             required: "E-Mail ist erforderlich",
                             pattern: { value: /\S+@\S+\.\S+/, message: "Bitte gib eine gültige E-Mail Adresse ein" }
                           })}
-                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-600"
+                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none placeholder:text-gray-600"
                         />
                       </div>
                       {contactForm.formState.errors.email && <p className="text-red-600 text-sm mt-2 text-left font-medium">{contactForm.formState.errors.email.message}</p>}
@@ -329,49 +381,49 @@ export default function GoldenTicketForm() {
                           type="tel"
                           placeholder="Telefonnummer (optional)"
                           {...contactForm.register("phone")}
-                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-600"
+                          className="w-full pl-12 pr-6 py-4 text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none placeholder:text-gray-600"
                         />
                       </div>
                     </div>
 
                     {/* Adresse */}
-                    <div className="space-y-3 bg-white/20 p-4 rounded-xl">
-                      <p className="text-sm font-semibold text-gray-800">Lieferadresse (optional)</p>
+                    <div className="space-y-3 bg-white/20 p-3 md:p-4 rounded-xl">
+                      <p className="text-xs md:text-sm font-semibold text-gray-800">📍 Lieferadresse (optional)</p>
                       <div className="relative">
-                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                        <MapPin className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 md:w-5 md:h-5" />
                         <input
                           type="text"
                           placeholder="Straße und Hausnummer"
                           {...contactForm.register("street")}
-                          className="w-full pl-12 pr-6 py-3 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-600"
+                          className="w-full pl-10 md:pl-12 pr-4 md:pr-6 py-3 text-sm md:text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none placeholder:text-gray-600"
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-2 md:gap-3">
                         <input
                           type="text"
                           placeholder="PLZ"
                           {...contactForm.register("postalCode")}
-                          className="w-full px-4 py-3 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-600"
+                          className="w-full px-3 md:px-4 py-3 text-sm md:text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none placeholder:text-gray-600"
                         />
                         <input
                           type="text"
                           placeholder="Stadt"
                           {...contactForm.register("city")}
-                          className="w-full px-4 py-3 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none placeholder:text-gray-600"
+                          className="w-full px-3 md:px-4 py-3 text-sm md:text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none placeholder:text-gray-600"
                         />
                       </div>
                       <select
                         {...contactForm.register("country")}
-                        className="w-full px-4 py-3 text-base text-gray-900 border-2 border-white/30 bg-white/40 rounded-xl focus:border-amber-500 focus:bg-white/60 focus:outline-none"
+                        className="w-full px-3 md:px-4 py-3 text-sm md:text-base text-gray-900 border-2 border-red-300 bg-white/60 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:bg-white focus:outline-none"
                       >
-                        <option value="DE">Deutschland</option>
-                        <option value="AT">Österreich</option>
-                        <option value="CH">Schweiz</option>
+                        <option value="DE">🇩🇪 Deutschland</option>
+                        <option value="AT">🇦🇹 Österreich</option>
+                        <option value="CH">🇨🇭 Schweiz</option>
                       </select>
                     </div>
 
                     {/* Gewinnspiel-Teilnahme Checkbox (PFLICHT) */}
-                    <label className="flex items-start gap-3 text-left bg-amber-50/80 border-2 border-amber-300 rounded-xl p-4">
+                    <label className="flex items-start gap-2 md:gap-3 text-left bg-gradient-to-r from-red-50 to-green-50 border-2 border-red-400 rounded-xl p-3 md:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-shadow">
                       <input
                         type="checkbox"
                         checked={consent}
@@ -379,16 +431,16 @@ export default function GoldenTicketForm() {
                           setConsent(e.target.checked);
                           if (e.target.checked) setConsentError("");
                         }}
-                        className="mt-1 h-5 w-5"
+                        className="mt-1 h-4 w-4 md:h-5 md:w-5 text-red-600 border-red-400 rounded focus:ring-red-500 flex-shrink-0"
                       />
-                      <span className="text-sm text-gray-800">
-                        <strong>Ich akzeptiere die <a href="/teilnahmebedingungen" target="_blank" className="underline text-amber-700">Teilnahmebedingungen</a> und die <a href="/datenschutz" target="_blank" className="underline text-amber-700">Datenschutzerklärung</a>. *</strong>
+                      <span className="text-xs md:text-sm text-gray-800">
+                        <strong className="text-red-700">🎄 Ich akzeptiere die <a href="/teilnahmebedingungen" target="_blank" className="underline text-red-700">Teilnahmebedingungen</a> und die <a href="/datenschutz" target="_blank" className="underline text-red-700">Datenschutzerklärung</a>. *</strong>
                       </span>
                     </label>
-                    {consentError && <p className="text-red-600 text-sm -mt-2">{consentError}</p>}
+                    {consentError && <p className="text-red-600 text-xs md:text-sm -mt-2 font-semibold px-2">{consentError}</p>}
 
                     {/* Newsletter Checkbox (OPTIONAL) */}
-                    <label className="flex items-start gap-3 text-left bg-green-50/80 border-2 border-green-300 rounded-xl p-4">
+                    <label className="flex items-start gap-2 md:gap-3 text-left bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-xl p-3 md:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-shadow">
                       <input
                         type="checkbox"
                         checked={newsletterOptIn}
@@ -396,12 +448,12 @@ export default function GoldenTicketForm() {
                           setNewsletterOptIn(e.target.checked);
                           if (!e.target.checked) setNewsletterError("");
                         }}
-                        className="mt-1 h-5 w-5"
+                        className="mt-1 h-4 w-4 md:h-5 md:w-5 text-green-600 border-green-400 rounded focus:ring-green-500 flex-shrink-0"
                       />
-                      <span className="text-sm text-gray-800">
-                        Ja, ich möchte den Newsletter von <strong>Sweets aus aller Welt</strong> per E-Mail erhalten mit exklusiven Angeboten und News.
+                      <span className="text-xs md:text-sm text-gray-800 leading-relaxed">
+                        <strong className="text-green-700">🎁 BONUS:</strong> Ja, ich möchte den Newsletter von <strong>Sweets aus aller Welt</strong> per E-Mail erhalten mit exklusiven Angeboten und News.
                         Hinweise zu Inhalten, Protokollierung, Versand über Mailchimp, statistischer Auswertung sowie Widerruf findest du in der{" "}
-                        <a href="/datenschutz" target="_blank" className="underline text-green-700">Datenschutzerklärung</a>.
+                        <a href="/datenschutz" target="_blank" className="underline text-green-700 font-semibold">Datenschutzerklärung</a>.
                         Die Einwilligung kann jederzeit über den Abmeldelink widerrufen werden.
                       </span>
                     </label>
@@ -411,29 +463,34 @@ export default function GoldenTicketForm() {
                       whileTap={{ scale: isLoading ? 1 : 0.98 }}
                       type="submit"
                       disabled={isLoading || !consent}
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-700 transition-all disabled:opacity-70 flex items-center justify-center gap-3 text-base"
+                      className="w-full bg-gradient-to-r from-red-600 via-green-600 to-red-600 text-white font-black py-4 md:py-5 px-4 md:px-6 rounded-xl shadow-2xl hover:shadow-green-500/50 transition-all disabled:opacity-70 flex items-center justify-center gap-2 md:gap-3 text-base md:text-lg border-2 border-white"
                     >
                       {isLoading ? (
-                        <><div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> Wird verarbeitet...</>
+                        <><div className="animate-spin rounded-full h-5 w-5 md:h-6 md:w-6 border-3 border-white border-t-transparent" /> 🎅 Wird verarbeitet...</>
                       ) : (
-                        <>Jetzt am Gewinnspiel teilnehmen! <ChevronRight className="w-5 h-5" /></>
+                        <>
+                          <span className="hidden sm:inline">🎄</span>
+                          <span className="text-sm md:text-base lg:text-lg">Jetzt teilnehmen!</span>
+                          <span className="hidden sm:inline">🎁</span>
+                          <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                        </>
                       )}
                     </motion.button>
                   </form>
 
                   {/* Legal links */}
-                  <div className="text-xs text-gray-700 mt-4 text-center drop-shadow-sm space-y-2">
-                    <p className="text-xs leading-relaxed bg-white/50 p-3 rounded-lg">
-                      <strong>Aktionszeitraum:</strong> 01.11.25 – 11.01.2026. Einlösung bis: 31.01.2026<br />
+                  <div className="text-[10px] md:text-xs text-gray-700 mt-4 text-center drop-shadow-sm space-y-2">
+                    <p className="text-[10px] md:text-xs leading-relaxed bg-white/50 p-2 md:p-3 rounded-lg">
+                      <strong>Aktionszeitraum:</strong> 01.11.25 – 11.01.2026. Einlösung bis: 31.01.2026<br className="hidden sm:block" /><span className="sm:hidden"> </span>
                       <strong>Teilnahmezeitraum:</strong> 01.12.–24.12.2025 bis 23:59 MEZ · Teilnahme ab 18 Jahren, DE/AT/CH · Keine Kaufpflicht – kostenlose Teilnahme möglich ·
                       Veranstalter: Venture One Group GmbH, Wuppertal.
-                      <a href="/teilnahmebedingungen" target="_blank" className="underline ml-1">Teilnahmebedingungen & Datenschutz</a> ·
+                      <a href="/teilnahmebedingungen" target="_blank" className="underline ml-1 text-red-700 font-semibold">Teilnahmebedingungen & Datenschutz</a> ·
                       Gewinne nicht übertragbar, keine Barauszahlung · Der Rechtsweg ist ausgeschlossen.
                     </p>
-                    <p>
-                      <a href="/impressum" target="_blank" className="underline">Impressum</a> ·{" "}
-                      <a href="/datenschutz" target="_blank" className="underline">Datenschutzerklärung</a> ·{" "}
-                      <a href="/agb" target="_blank" className="underline">AGB</a>
+                    <p className="text-[10px] md:text-xs">
+                      <a href="/impressum" target="_blank" className="underline hover:text-red-600">Impressum</a> ·{" "}
+                      <a href="/datenschutz" target="_blank" className="underline hover:text-red-600">Datenschutzerklärung</a> ·{" "}
+                      <a href="/agb" target="_blank" className="underline hover:text-red-600">AGB</a>
                     </p>
                   </div>
                 </motion.div>
