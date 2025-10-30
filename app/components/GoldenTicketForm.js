@@ -80,10 +80,10 @@ export default function GoldenTicketForm() {
         ticketCode,
         newsletterOptIn,
         source: "rubbellos",
-        offer: "Adventskalender 2024",
+        offer: "Adventskalender 2025",
         utm_source: getUTMParameter("utm_source") || "direct",
         utm_medium: getUTMParameter("utm_medium") || "organic",
-        utm_campaign: getUTMParameter("utm_campaign") || "rubbellos_2024",
+        utm_campaign: getUTMParameter("utm_campaign") || "rubbellos_2025",
         consent: true,
         consentTs: new Date().toISOString(),
       }),
@@ -245,7 +245,7 @@ export default function GoldenTicketForm() {
                 Gib deinen 8-stelligen Code ein und <span className="text-red-600">🎅 erfahre welche Gewinne hinter deinem Rubbellos stecken ✨</span>
               </p>
               <div className="inline-block bg-gradient-to-r from-red-500 to-green-500 text-white px-6 py-2 rounded-full shadow-lg">
-                <span className="font-bold text-base">🎄 Adventskalender-Gewinnspiel 2024 🎁</span>
+                <span className="font-bold text-base">🎄 Adventskalender-Gewinnspiel 2025 🎁</span>
               </div>
             </motion.div>
           </div>
@@ -276,7 +276,7 @@ export default function GoldenTicketForm() {
                       {/* Rubbellos-Style Code-Eingabe */}
                       <div className="relative bg-gradient-to-br from-gray-300 via-gray-200 to-gray-300 p-4 md:p-6 rounded-2xl shadow-2xl border-2 md:border-4 border-gray-400">
                         <div className="absolute top-1 md:top-2 left-1 md:left-2 text-[8px] md:text-xs font-bold text-gray-600">GOLDEN TICKET</div>
-                        <div className="absolute top-1 md:top-2 right-1 md:right-2 text-[8px] md:text-xs font-bold text-gray-600">★ XMAS 2024</div>
+                        <div className="absolute top-1 md:top-2 right-1 md:right-2 text-[8px] md:text-xs font-bold text-gray-600">★ XMAS 2025</div>
 
                         <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 md:p-4 border-2 border-dashed border-red-400 mt-3 md:mt-0">
                           <Ticket className="mx-auto text-red-600 w-6 h-6 md:w-8 md:h-8 mb-2" />

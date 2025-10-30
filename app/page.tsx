@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Head from "next/head";
-import HeroSection from "./components/HeroSection";
-import StepByStepGuide from "./components/StepByStepGuide";
+import ChristmasGiveawayForm from "./components/ChristmasGiveawayForm";
 import Footer from "./components/Footer";
 
 function trackEvent(eventName: any) {
@@ -42,35 +41,30 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Sweets aus aller Welt - Süßigkeiten & Snacks Online kaufen</title>
+        <title>Weihnachts-Gewinnspiel - Sweets aus aller Welt</title>
         <meta
           name="description"
-          content="Entdecke einzigartige Süßigkeiten aus über 30 Ländern. Von japanischen Kit-Kats bis amerikanischen Sour Patch Kids. 50.000+ zufriedene Kunden!"
+          content="Mach mit bei unserem Weihnachts-Gewinnspiel 2025! Gewinne tolle Preise rund um Süßigkeiten aus aller Welt. Kostenlose Teilnahme!"
         />
         <meta
           name="keywords"
-          content="süßigkeiten, snacks, international, japan, usa, korea, süßes, online shop"
+          content="gewinnspiel, weihnachten, adventskalender, süßigkeiten, snacks, sweets aus aller welt"
         />
         <meta
           property="og:title"
-          content="Sweets aus aller Welt - Deine süße Reise beginnt hier"
+          content="Weihnachts-Gewinnspiel 2025 - Sweets aus aller Welt"
         />
         <meta
           property="og:description"
-          content="Über 50.000 zufriedene Kunden! Entdecke einzigartige Süßigkeiten aus aller Welt."
+          content="Jetzt mitmachen und tolle Preise gewinnen! Kostenlose Teilnahme am Weihnachts-Gewinnspiel."
         />
         <meta property="og:image" content="/og-image.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* Hero Section */}
-      <div id="hero-section">
-        <HeroSection onCTAClick={scrollToHero} />
-      </div>
-
-      {/* Step by Step Guide - NEU HINZUGEFÜGT */}
-      <StepByStepGuide />
+      {/* Christmas Giveaway Form */}
+      <ChristmasGiveawayForm />
 
       {/* Footer Komponente */}
       <Footer />

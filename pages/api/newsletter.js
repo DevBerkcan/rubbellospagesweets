@@ -142,14 +142,22 @@ export default async function handler(req, res) {
 
     // Tags basierend auf bereitgestellten Daten erstellen
     const tags = [
-      { name: "website-signup", status: "active" }, 
+      { name: "website-signup", status: "active" },
       { name: source, status: "active" }
     ];
-    
+
     if (source === "hero_dubai_offer" || source === "hero_offer") {
       tags.push({ name: "dubai_chocolate", status: "active" });
     }
-    
+
+    if (source === "rubbellos") {
+      tags.push({ name: "rubbellos_gewinnspiel", status: "active" });
+      tags.push({ name: "adventskalender_2025", status: "active" });
+      if (statusIfNew === "pending") {
+        tags.push({ name: "newsletter-opt-in", status: "active" });
+      }
+    }
+
     if (offer) {
       tags.push({ name: String(offer).toLowerCase().replace(/\s+/g, "_"), status: "active" });
     }

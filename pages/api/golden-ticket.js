@@ -21,10 +21,10 @@ export default async function handler(req, res) {
       postalCode,
       country,
       source = "golden_ticket",
-      offer = "Adventskalender 2024",
+      offer = "Adventskalender 2025",
       utm_source = "direct",
       utm_medium = "organic",
-      utm_campaign = "golden_ticket_2024",
+      utm_campaign = "golden_ticket_2025",
       consent,
       consentTs,
       newsletterOptIn = false
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     // Tags sammeln
     const tags = [
       "gewinnspiel-teilnehmer",  // ALLE Gewinnspiel-Teilnehmer
-      "golden-ticket-2024",      // Kampagnen-spezifisch
+      "golden-ticket-2025",      // Kampagnen-spezifisch
       "rubbellos",               // Quelle: Rubbellos-Gewinnspiel
       source,                    // z.B. "rubbellos"
       `ticket-${ticketCode.substring(0, 3)}`, // Erste 3 Zeichen für Gruppierung
