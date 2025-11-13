@@ -122,9 +122,9 @@ export default function ChristmasGiveawayForm() {
     );
   }
 
-  // FORM (responsive)
+  // FORM (responsive mit höherer Position auf Mobile)
   return (
-    <div className="relative min-h-screen flex items-end justify-center px-4 pb-6 pt-20 overflow-hidden md:items-center md:pt-0">
+    <div className="relative min-h-screen flex items-end justify-center px-4 pb-6 pt-32 overflow-hidden md:items-center md:pt-0">
       {/* Mobile Hintergrundbild */}
       <div className="absolute inset-0 z-0 md:hidden">
         <Image
