@@ -41,7 +41,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Weihnachts-Gewinnspiel - Sweets aus aller Welt</title>
+        <title>Rubbellos-Gewinnspiel - Sweets aus aller Welt</title>
         <meta
           name="description"
           content="Mach mit bei unserem Weihnachts-Gewinnspiel 2025! Gewinne tolle Preise rund um Süßigkeiten aus aller Welt. Kostenlose Teilnahme!"
