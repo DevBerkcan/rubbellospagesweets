@@ -124,7 +124,7 @@ export default function ChristmasGiveawayForm() {
 
   // FORM (responsive mit höherer Position auf Mobile)
   return (
-    <div className="relative min-h-screen flex items-end justify-center px-4 pb-6 pt-32 overflow-hidden md:items-center md:pt-0">
+    <div className="relative min-h-screen flex items-end justify-center px-4 pb-6 pt-32 overflow-hidden md:items-end md:pb-16 md:pt-0">
       {/* Mobile Hintergrundbild */}
       <div className="absolute inset-0 z-0 md:hidden">
         <Image
@@ -162,6 +162,10 @@ export default function ChristmasGiveawayForm() {
           >
             {/* CODE */}
             <div className="w-full">
+              {/* Überschrift nur auf Desktop */}
+              <h2 className="hidden md:block text-white text-center text-lg font-semibold mb-3 drop-shadow-lg">
+                Gib hier dein Code ein
+              </h2>
               <div className="bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-600 rounded-[32px] p-[2px] shadow-xl md:rounded-3xl">
                 <div className="bg-sky-900/40 rounded-[30px] px-5 py-3 flex items-center justify-center gap-2 md:px-6 md:py-4">
                   <Gift className="w-4 h-4 text-white/80 md:w-5 md:h-5" />
@@ -194,7 +198,7 @@ export default function ChristmasGiveawayForm() {
               <div>
                 <input
                   type="text"
-                  placeholder="Toan"
+                  placeholder="Max"
                   {...contactForm.register("firstName", {
                     required: "Vorname ist erforderlich",
                     minLength: { value: 2, message: "Mindestens 2 Zeichen" },
@@ -210,7 +214,7 @@ export default function ChristmasGiveawayForm() {
               <div>
                 <input
                   type="text"
-                  placeholder="Pham"
+                  placeholder="Mustermann"
                   {...contactForm.register("lastName", {
                     required: "Nachname ist erforderlich",
                     minLength: { value: 2, message: "Mindestens 2 Zeichen" },
@@ -230,7 +234,7 @@ export default function ChristmasGiveawayForm() {
               <div>
                 <input
                   type="email"
-                  placeholder="toan@padesign.io"
+                  placeholder="max@sweetsausallerwelt.de"
                   {...contactForm.register("email", {
                     required: "E-Mail ist erforderlich",
                     pattern: {
@@ -250,7 +254,7 @@ export default function ChristmasGiveawayForm() {
               <div>
                 <input
                   type="tel"
-                  placeholder="+49 151 ..."
+                  placeholder="+49 151 23456789"
                   {...contactForm.register("phone")}
                   className="w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md border border-white/40 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400 md:px-5 md:py-3 md:text-sm"
                 />
@@ -355,9 +359,15 @@ export default function ChristmasGiveawayForm() {
                 className="mt-0.5 h-3 w-3 text-amber-400 bg-transparent border-white/50 rounded focus:ring-amber-400 focus:ring-1 md:h-4 md:w-4 md:mt-0"
               />
               <span>
-                <span className="font-bold text-amber-300">🎁 BONUS:</span> Ja,
-                ich möchte den Newsletter von Sweets aus aller Welt per E-Mail
-                erhalten.
+                <span className="font-bold text-amber-300">🎁 BONUS:</span> Ja, ich möchte den Newsletter von Sweets aus aller Welt per E-Mail erhalten mit exklusiven Angeboten und News. Hinweise zu Inhalten, Protokollierung, Versand über Mailchimp, statistischer Auswertung sowie Widerruf findest du in der{" "}
+                <a
+                  href="/datenschutz"
+                  target="_blank"
+                  className="underline hover:text-amber-200"
+                >
+                  Datenschutzerklärung
+                </a>
+                . Die Einwilligung kann jederzeit über den Abmeldelink widerrufen werden.
               </span>
             </label>
 
