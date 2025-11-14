@@ -164,7 +164,7 @@ export default function ChristmasGiveawayForm() {
             <div className="w-full">
               {/* Überschrift nur auf Desktop */}
               <h2 className="hidden md:block text-white text-center text-lg font-semibold mb-3 drop-shadow-lg">
-                Gib hier dein Code ein
+                Gib hier deinen Code ein
               </h2>
               <div className="bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-600 rounded-[32px] p-[2px] shadow-xl md:rounded-3xl">
                 <div className="bg-sky-900/40 rounded-[30px] px-5 py-3 flex items-center justify-center gap-2 md:px-6 md:py-4">
