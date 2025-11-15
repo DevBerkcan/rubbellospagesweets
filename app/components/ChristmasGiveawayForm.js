@@ -13,6 +13,7 @@ export default function ChristmasGiveawayForm() {
   const [consent, setConsent] = useState(false);
   const [consentError, setConsentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [ticketCode, setTicketCode] = useState("");
   const submittedRef = useRef(false);
 
   const contactForm = useForm({ mode: "onSubmit", reValidateMode: "onBlur" });
@@ -80,42 +81,144 @@ export default function ChristmasGiveawayForm() {
         throw new Error(result.message || "Teilnahme fehlgeschlagen");
       }
 
+      setTicketCode(data.ticketCode.toUpperCase());
       setStep("done");
       submittedRef.current = false;
     } catch (error) {
       console.error("Golden Ticket error:", error);
-      alert(
-        error.message || "Ein Fehler ist aufgetreten. Bitte versuche es erneut."
-      );
+
+      // Bessere Fehlermeldungen für spezifische Fehler
+      let errorMessage = "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
+
+      if (error.message.includes("bereits eingelöst") || error.message.includes("CODE_ALREADY_USED")) {
+        errorMessage = "❌ Dieser Code wurde bereits eingelöst. Bitte verwende einen anderen Code.";
+      } else if (error.message.includes("bereits teilgenommen") || error.message.includes("EMAIL_ALREADY_PARTICIPATED")) {
+        errorMessage = "❌ Du hast bereits mit dieser E-Mail Adresse teilgenommen. Pro E-Mail ist nur eine Teilnahme möglich.";
+      } else if (error.message.includes("gültigen 8-stelligen Code")) {
+        errorMessage = "❌ Bitte gib einen gültigen 8-stelligen Code ein (nur Buchstaben und Zahlen).";
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+
+      alert(errorMessage);
       submittedRef.current = false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // SUCCESS
+  // SUCCESS SCREEN mit Background-Image und Modal
   if (step === "done") {
     return (
-      <div className="relative min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+        {/* Mobile Hintergrundbild */}
+        <div className="absolute inset-0 z-0 md:hidden">
+          <Image
+            src="/Rubbellos.png"
+            alt="Hintergrund Mobile"
+            fill
+            priority
+            className="object-cover"
+            quality={100}
+          />
+          {/* Blur Overlay */}
+          <div className="absolute inset-0 backdrop-blur-md bg-black/30" />
+        </div>
+
+        {/* Desktop Hintergrundbild */}
+        <div className="absolute inset-0 z-0 hidden md:block">
+          <Image
+            src="/Rubbellos_desktop.png"
+            alt="Hintergrund Desktop"
+            fill
+            priority
+            className="object-cover"
+            quality={100}
+          />
+          {/* Blur Overlay */}
+          <div className="absolute inset-0 backdrop-blur-md bg-black/30" />
+        </div>
+
+        {/* Success Modal */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-sm mx-auto relative z-10 px-4"
+          transition={{ duration: 0.5 }}
+          className="relative z-10 w-full max-w-lg mx-auto"
         >
-          <h1 className="text-xl font-bold mb-3">TEILNAHME BESTÄTIGT!</h1>
-          <p className="text-gray-700 mb-3 text-sm">
-            Deine Teilnahme wurde erfolgreich registriert!
-          </p>
-          <div className="bg-white p-3 rounded-lg border border-gray-200 space-y-2">
-            <p className="text-xs text-gray-600">
-              {newsletterOptIn
-                ? "Bitte bestätige deine Newsletter-Anmeldung in der E-Mail (Double-Opt-In)."
-                : "Deine Teilnahme wurde gespeichert!"}
-            </p>
-            <p className="text-[11px] text-gray-500">
-              Der Gewinner wird nach Ende des Teilnahmezeitraums (24.12.2025)
-              per E-Mail benachrichtigt.
-            </p>
+          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 border-2 border-white/50">
+            {/* Success Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="text-center mb-4"
+            >
+              <div className="inline-block text-6xl md:text-7xl">🎄🎁</div>
+            </motion.div>
+
+            {/* Heading */}
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-4 bg-gradient-to-r from-red-600 via-green-600 to-red-600 bg-clip-text text-transparent">
+              TEILNAHME BESTÄTIGT!
+            </h1>
+
+            {/* Code Display */}
+            <div className="bg-gradient-to-r from-red-50 to-green-50 rounded-xl p-4 mb-4 border-2 border-red-200">
+              <p className="text-sm text-gray-600 text-center mb-2">
+                Dein Code wurde erfolgreich registriert:
+              </p>
+              <p className="text-2xl md:text-3xl font-bold text-center text-red-600 tracking-[0.3em]">
+                {ticketCode}
+              </p>
+              <p className="text-xs text-center text-gray-500 mt-2">🎫✨</p>
+            </div>
+
+            {/* Info Box */}
+            <div className="bg-gradient-to-br from-red-50 to-green-50 rounded-xl p-4 mb-4 space-y-3 border border-red-100">
+              <p className="text-sm text-gray-700 text-center">
+                {newsletterOptIn
+                  ? "📧 Bitte bestätige deine Newsletter-Anmeldung in der E-Mail."
+                  : "✅ Deine Teilnahme wurde gespeichert!"}
+              </p>
+              <p className="text-xs text-gray-600 text-center">
+                🎅 Der Gewinner wird nach Ende des Teilnahmezeitraums (24.12.2025) per E-Mail benachrichtigt.
+              </p>
+              {newsletterOptIn && (
+                <p className="text-xs text-gray-500 text-center">
+                  💡 Falls keine E-Mail kommt: Spam-Ordner prüfen.
+                </p>
+              )}
+            </div>
+
+            {/* Shop Button */}
+            <motion.a
+              href="https://www.sweetsausallerwelt.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="block w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-4 px-6 rounded-full shadow-lg transition-all duration-200 text-center mb-4"
+            >
+              <span className="flex items-center justify-center gap-2">
+                🛍️ Zum Shop
+                <ChevronRight className="w-5 h-5" />
+              </span>
+            </motion.a>
+
+            {/* Legal Text */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+              <p className="text-[10px] md:text-xs text-gray-600 leading-relaxed text-center">
+                🎄 <strong>Teilnahmezeitraum:</strong> 01.12.–24.12.2025 bis 23:59 MEZ · Teilnahme ab 18 Jahren, DE/AT/CH · Keine Kaufpflicht – kostenlose Teilnahme möglich · Veranstalter: Venture One Group GmbH, Wuppertal.{" "}
+                <a
+                  href="/teilnahmebedingungen"
+                  target="_blank"
+                  className="underline text-red-700 font-semibold hover:text-red-800"
+                >
+                  Teilnahmebedingungen
+                </a>{" "}
+                · Gewinne nicht übertragbar, keine Barauszahlung · Der Rechtsweg ist ausgeschlossen.
+              </p>
+            </div>
           </div>
         </motion.div>
       </div>

@@ -1,7 +1,8 @@
 // pages/api/golden-ticket.js
-import crypto from "crypto";
+const crypto = require("crypto");
+const { validateSubmission, markCodeAsUsed } = require("../../lib/codeValidator");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -38,6 +39,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "Gültiger 8-stelliger Code erforderlich" });
     }
 
+    // DUPLIKAT-PRÄVENTION: Prüfe ob Code bereits verwendet oder Email bereits teilgenommen
+    const validationResult = validateSubmission(ticketCode, email, utm_campaign || "rubbellos_2025");
+    if (!validationResult.valid) {
+      console.warn(`❌ Duplikat erkannt: ${validationResult.error}`, { ticketCode, email });
+      return res.status(400).json({
+        message: validationResult.message,
+        error: validationResult.error,
+        ...validationResult.data
+      });
+    }
+
     const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
     const MAILCHIMP_AUDIENCE_ID = process.env.MAILCHIMP_AUDIENCE_ID;
 
@@ -50,13 +62,14 @@ export default async function handler(req, res) {
     const subscriberHash = crypto.createHash("md5").update(email.toLowerCase()).digest("hex");
     const memberUrl = `https://${dc}.api.mailchimp.com/3.0/lists/${MAILCHIMP_AUDIENCE_ID}/members/${subscriberHash}`;
 
-    // Tags sammeln
+    // Tags sammeln - steuern welche Automations getriggert werden
     const tags = [
-      "gewinnspiel-teilnehmer",
-      "golden-ticket-2025", 
+      "gewinnspiel-teilnehmer",  // → Triggers Gewinnspiel-Bestätigungs-Mail (ALLE)
+      "golden-ticket-2025",
       "rubbellos",
       source,
       `ticket-${ticketCode.substring(0, 3)}`,
+      "website-rubbellos"  // Multi-Website Tracking
     ];
 
     if (street && city && postalCode) {
@@ -71,8 +84,9 @@ export default async function handler(req, res) {
       tags.push(`utm_campaign_${utm_campaign}`);
     }
 
+    // Newsletter-Tag System: pending → wartet auf Bestätigung
     if (newsletterOptIn) {
-      tags.push("newsletter-opt-in");
+      tags.push("newsletter-pending");  // → Triggers Newsletter-Opt-in Mail
       tags.push("golden-ticket-gewinnspiel");
     }
 
@@ -84,6 +98,7 @@ export default async function handler(req, res) {
       TICKET: ticketCode,
       OFFER: offer,
       SOURCE: source,
+      WEBSITE: "rubbellos.sweetsausallerwelt.de",  // Multi-Website Tracking
       UTM_SOURCE: utm_source || "",
       UTM_MEDIUM: utm_medium || "",
       UTM_CAMPAIGN: utm_campaign || "",
@@ -99,10 +114,12 @@ export default async function handler(req, res) {
       };
     }
 
-    // Mailchimp Payload
+    // Mailchimp Payload - IMMER "subscribed" verwenden!
+    // Tags entscheiden über welche Mails verschickt werden
     const mailchimpPayload = {
       email_address: email,
-      status_if_new: newsletterOptIn ? "pending" : "transactional",
+      status_if_new: "subscribed",  // Sofortige Speicherung
+      status: "subscribed",          // Auch für existing users
       merge_fields
     };
 
@@ -139,10 +156,21 @@ export default async function handler(req, res) {
       }),
     });
 
+    // Code in Datenbank markieren (nach erfolgreichem Mailchimp-Call)
+    markCodeAsUsed(ticketCode, email, {
+      website: "rubbellos.sweetsausallerwelt.de",
+      campaign: utm_campaign || "rubbellos_2025",
+      firstName,
+      lastName,
+      newsletterOptIn
+    });
+
     console.log("✅ Golden Ticket Teilnahme gespeichert:", {
       email,
       ticketCode,
-      status: newsletterOptIn ? "pending (DOI)" : "transactional"
+      status: "subscribed",
+      newsletter: newsletterOptIn ? "pending (DOI wird verschickt)" : "nicht aktiviert",
+      tags: tags.join(", ")
     });
 
     return res.status(200).json({

@@ -148,56 +148,118 @@ export default function GoldenTicketForm() {
     }
   };
 
-  // Success Screen
+  // Success Screen mit Background-Image und Modal
   if (step === "done") {
     return (
-      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-green-50 to-red-50 px-4">
-        {/* Weihnachtliche Schneeflocken Animation */}
-        {!prefersReducedMotion && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {Array.from({ length: window.innerWidth < 768 ? 10 : 20 }).map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute text-3xl md:text-4xl"
-                initial={{ top: -50, left: `${Math.random() * 100}%` }}
-                animate={{ top: "110vh", rotate: 360 }}
-                transition={{ duration: 8 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 5 }}
-              >
-                ❄️
-              </motion.div>
-            ))}
-          </div>
-        )}
+      <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+        {/* Mobile Hintergrundbild */}
+        <div className="absolute inset-0 z-0 md:hidden">
+          <Image
+            src="/Rubbellos.png"
+            alt="Hintergrund Mobile"
+            fill
+            priority
+            className="object-cover"
+            quality={100}
+          />
+          {/* Blur Overlay */}
+          <div className="absolute inset-0 backdrop-blur-md bg-black/30" />
+        </div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center max-w-lg mx-auto relative z-10 px-4">
-          <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-5xl md:text-7xl mb-4 md:mb-6">🎄🎁</motion.div>
-          <h1 className="text-3xl md:text-4xl lg:text-6xl font-black mb-4 md:mb-6 px-2">
-            <span className="bg-gradient-to-r from-red-600 via-green-600 to-red-600 bg-clip-text text-transparent">TEILNAHME BESTÄTIGT!</span>
-          </h1>
-          <p className="text-lg md:text-xl lg:text-2xl text-gray-700 mb-4 md:mb-6 px-2">
-            Dein Code <strong className="text-red-600 text-xl md:text-2xl">{ticketCode}</strong> wurde erfolgreich registriert! 🎫✨
-          </p>
-          <div className="bg-white/90 backdrop-blur-sm p-4 md:p-5 rounded-xl shadow-lg border-2 border-red-200 space-y-3">
-            <p className="text-sm md:text-base text-gray-600">
-              {newsletterOptIn
-                ? "📧 Bitte bestätige deine Newsletter-Anmeldung in der E-Mail (Double-Opt-In)."
-                : "✅ Deine Teilnahme wurde gespeichert!"}
-            </p>
-            <p className="text-xs md:text-sm text-gray-500">
-              🎅 Der Gewinner wird nach Ende des Teilnahmezeitraums (24.12.2025) per E-Mail benachrichtigt.
-            </p>
-            {newsletterOptIn && (
-              <p className="text-xs md:text-sm text-gray-500">Falls keine E-Mail kommt: Spam-Ordner prüfen.</p>
-            )}
-          </div>
+        {/* Desktop Hintergrundbild */}
+        <div className="absolute inset-0 z-0 hidden md:block">
+          <Image
+            src="/Rubbellos_desktop.png"
+            alt="Hintergrund Desktop"
+            fill
+            priority
+            className="object-cover"
+            quality={100}
+          />
+          {/* Blur Overlay */}
+          <div className="absolute inset-0 backdrop-blur-md bg-black/30" />
+        </div>
 
-          <div className="mt-6 md:mt-8 bg-gradient-to-r from-red-50 to-green-50 border-2 border-red-300 rounded-xl p-3 md:p-4 shadow-lg">
-            <p className="text-[10px] md:text-xs text-gray-700 leading-relaxed">
-              🎄 <strong>Teilnahmezeitraum:</strong> 01.12.–24.12.2025 bis 23:59 MEZ · Teilnahme ab 18 Jahren, DE/AT/CH · Keine Kaufpflicht – kostenlose Teilnahme möglich ·
-              Veranstalter: Venture One Group GmbH, Wuppertal.
-              <a href="/teilnahmebedingungen" target="_blank" className="underline ml-1 text-red-700 font-semibold">Teilnahmebedingungen</a> ·
-              Gewinne nicht übertragbar, keine Barauszahlung · Der Rechtsweg ist ausgeschlossen.
-            </p>
+        {/* Success Modal */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 w-full max-w-lg mx-auto"
+        >
+          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 border-2 border-white/50">
+            {/* Success Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="text-center mb-4"
+            >
+              <div className="inline-block text-6xl md:text-7xl">🎄🎁</div>
+            </motion.div>
+
+            {/* Heading */}
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-4 bg-gradient-to-r from-red-600 via-green-600 to-red-600 bg-clip-text text-transparent">
+              TEILNAHME BESTÄTIGT!
+            </h1>
+
+            {/* Code Display */}
+            <div className="bg-gradient-to-r from-red-50 to-green-50 rounded-xl p-4 mb-4 border-2 border-red-200">
+              <p className="text-sm text-gray-600 text-center mb-2">
+                Dein Code wurde erfolgreich registriert:
+              </p>
+              <p className="text-2xl md:text-3xl font-bold text-center text-red-600 tracking-[0.3em]">
+                {ticketCode}
+              </p>
+              <p className="text-xs text-center text-gray-500 mt-2">🎫✨</p>
+            </div>
+
+            {/* Info Box */}
+            <div className="bg-gradient-to-br from-red-50 to-green-50 rounded-xl p-4 mb-4 space-y-3 border border-red-100">
+              <p className="text-sm text-gray-700 text-center">
+                {newsletterOptIn
+                  ? "📧 Bitte bestätige deine Newsletter-Anmeldung in der E-Mail (Double-Opt-In)."
+                  : "✅ Deine Teilnahme wurde gespeichert!"}
+              </p>
+              <p className="text-xs text-gray-600 text-center">
+                🎅 Der Gewinner wird nach Ende des Teilnahmezeitraums (24.12.2025) per E-Mail benachrichtigt.
+              </p>
+              {newsletterOptIn && (
+                <p className="text-xs text-gray-500 text-center">
+                  💡 Falls keine E-Mail kommt: Spam-Ordner prüfen.
+                </p>
+              )}
+            </div>
+
+            {/* Shop Button */}
+            <motion.a
+              href="https://www.sweetsausallerwelt.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="block w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-4 px-6 rounded-full shadow-lg transition-all duration-200 text-center mb-4"
+            >
+              <span className="flex items-center justify-center gap-2">
+                🛍️ Zum Shop
+                <ChevronRight className="w-5 h-5" />
+              </span>
+            </motion.a>
+
+            {/* Legal Text */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+              <p className="text-[10px] md:text-xs text-gray-600 leading-relaxed text-center">
+                🎄 <strong>Teilnahmezeitraum:</strong> 01.12.–24.12.2025 bis 23:59 MEZ · Teilnahme ab 18 Jahren, DE/AT/CH · Keine Kaufpflicht – kostenlose Teilnahme möglich · Veranstalter: Venture One Group GmbH, Wuppertal.{" "}
+                <a
+                  href="/teilnahmebedingungen"
+                  target="_blank"
+                  className="underline text-red-700 font-semibold hover:text-red-800"
+                >
+                  Teilnahmebedingungen
+                </a>{" "}
+                · Gewinne nicht übertragbar, keine Barauszahlung · Der Rechtsweg ist ausgeschlossen.
+              </p>
+            </div>
           </div>
         </motion.div>
       </div>

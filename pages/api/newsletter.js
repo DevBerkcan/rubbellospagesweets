@@ -59,7 +59,8 @@ export default async function handler(req, res) {
     utm_source,
     utm_medium,
     utm_campaign,
-    statusIfNew = "subscribed", // "pending" für DOI
+    website = null, // Multi-Website Tracking
+    statusIfNew = "subscribed", // Immer "subscribed" für sofortige Speicherung
   } = req.body || {};
 
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
@@ -77,6 +78,13 @@ export default async function handler(req, res) {
     const basic = Buffer.from(`anystring:${API_KEY}`).toString("base64");
     const subscriberHash = crypto.createHash("md5").update(email.toLowerCase()).digest("hex");
 
+    // Automatische Website-Erkennung wenn nicht übergeben
+    const detectedWebsite = website ||
+      (source === "rubbellos" ? "rubbellos.sweetsausallerwelt.de" :
+       source === "goldenticket" ? "goldenticket.sweetsausallerwelt.de" :
+       source === "newsletter" ? "newsletter.sweetsausallerwelt.de" :
+       "sweetsausallerwelt.de");
+
     const merge_fields = buildMergeFields({
       firstName,
       lastName,
@@ -90,6 +98,9 @@ export default async function handler(req, res) {
       postalCode,
       country
     });
+
+    // WEBSITE Merge Field hinzufügen
+    merge_fields.WEBSITE = detectedWebsite;
 
     const memberUrl = `https://${DATACENTER}.api.mailchimp.com/3.0/lists/${LIST_ID}/members/${subscriberHash}`;
 
@@ -146,16 +157,19 @@ export default async function handler(req, res) {
       { name: source, status: "active" }
     ];
 
-    if (source === "hero_dubai_offer" || source === "hero_offer") {
-      tags.push({ name: "dubai_chocolate", status: "active" });
-    }
-
-    if (source === "rubbellos") {
+    // Website-spezifische Tags
+    if (source === "rubbellos" || detectedWebsite.includes("rubbellos")) {
+      tags.push({ name: "site-rubbellos", status: "active" });
       tags.push({ name: "rubbellos_gewinnspiel", status: "active" });
       tags.push({ name: "adventskalender_2025", status: "active" });
-      if (statusIfNew === "pending") {
-        tags.push({ name: "newsletter-opt-in", status: "active" });
-      }
+    } else if (source === "goldenticket" || detectedWebsite.includes("goldenticket")) {
+      tags.push({ name: "site-goldenticket", status: "active" });
+    } else if (source === "newsletter" || detectedWebsite.includes("newsletter")) {
+      tags.push({ name: "site-newsletter", status: "active" });
+    }
+
+    if (source === "hero_dubai_offer" || source === "hero_offer") {
+      tags.push({ name: "dubai_chocolate", status: "active" });
     }
 
     if (offer) {
