@@ -1,10 +1,10 @@
 // pages/api/golden-ticket.js
 // Rubbellos-Gewinnspiel Handler mit KLAVIYO Integration
 
-const { validateSubmission, markCodeAsUsed } = require("../../lib/codeValidator");
-const { createProfileAndSubscribe } = require("../../lib/klaviyo");
+import { validateSubmission, markCodeAsUsed } from "../../lib/codeValidator";
+import { createProfileAndSubscribe } from "../../lib/klaviyo";
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }

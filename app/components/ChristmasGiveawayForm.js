@@ -274,8 +274,8 @@ export default function ChristmasGiveawayForm() {
         />
       </div>
 
-      <div className="container mx-auto relative z-10 max-w-sm md:max-w-md space-y-4">
-      
+      <div className="container mx-auto relative z-10 max-w-sm md:max-w-md space-y-4 pt-32 md:pt-8">
+
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
