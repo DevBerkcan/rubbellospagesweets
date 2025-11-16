@@ -1,236 +1,158 @@
-import crypto from "crypto";
+// pages/api/newsletter.js
+// Newsletter/Hero-Signup Handler mit KLAVIYO Integration
 
-function buildMergeFields({ firstName, lastName, offer, source, utm_source, utm_medium, utm_campaign, street, city, postalCode, country }) {
-  const enabled = (process.env.MAILCHIMP_MERGE_TAGS || "FNAME,LNAME,ADDRESS")
-    .split(",").map(s => s.trim().toUpperCase()).filter(Boolean);
+const { createProfileAndSubscribe } = require("../../lib/klaviyo");
 
-  const candidate = {
-    FNAME: firstName || "",
-    LNAME: lastName || "",
-    OFFER: offer,
-    SOURCE: source,
-    UTM_SOURCE: utm_source,
-    UTM_MEDIUM: utm_medium,
-    UTM_CAMPAIGN: utm_campaign,
-  };
-
-  // Adresse zu Merge Fields hinzufügen, wenn vorhanden
-  if (street || city || postalCode || country) {
-    candidate.ADDRESS = {
-      addr1: street || "",
-      city: city || "",
-      zip: postalCode || "",
-      country: country || "DE"
-    };
-  }
-
-  const out = {};
-  for (const [k, v] of Object.entries(candidate)) {
-    if (enabled.includes(k) && v !== undefined && v !== null) {
-      // Spezielle Behandlung für ADDRESS-Objekt
-      if (k === "ADDRESS" && typeof v === "object") {
-        // Nur hinzufügen, wenn mindestens ein Adressfeld ausgefüllt ist
-        if (v.addr1 || v.city || v.zip) {
-          out[k] = v;
-        }
-      } else if (typeof v === "string" && v.trim() !== "") {
-        out[k] = v;
-      } else if (typeof v !== "string") {
-        out[k] = v;
-      }
-    }
-  }
-  return out;
-}
-
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
-
-  const {
-    email,
-    firstName = "",
-    lastName = "",
-    street = "",
-    city = "",
-    postalCode = "",
-    country = "DE",
-    source = "standard",
-    offer,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    website = null, // Multi-Website Tracking
-    statusIfNew = "subscribed", // Immer "subscribed" für sofortige Speicherung
-  } = req.body || {};
-
-  if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-    return res.status(400).json({ message: "Valid email is required" });
-  }
-
-  const API_KEY = process.env.MAILCHIMP_API_KEY;
-  const LIST_ID = process.env.MAILCHIMP_AUDIENCE_ID;
-  if (!API_KEY || !LIST_ID) {
-    return res.status(500).json({ message: "Server config missing (MAILCHIMP_* envs)" });
+module.exports = async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
   try {
-    const DATACENTER = API_KEY.split("-")[1];
-    const basic = Buffer.from(`anystring:${API_KEY}`).toString("base64");
-    const subscriberHash = crypto.createHash("md5").update(email.toLowerCase()).digest("hex");
+    const {
+      email,
+      firstName = "",
+      lastName = "",
+      phone = "",
+      street = "",
+      city = "",
+      postalCode = "",
+      country = "DE",
+      source = "standard",
+      offer,
+      code = "", // Optional: Rubbellos-Code
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      website = null, // Multi-Website Tracking
+    } = req.body || {};
 
-    // Automatische Website-Erkennung wenn nicht übergeben
+    // ========================================
+    // 1. VALIDIERUNG
+    // ========================================
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({ message: "Valid email is required" });
+    }
+
+    // ========================================
+    // 2. WEBSITE-ERKENNUNG
+    // ========================================
     const detectedWebsite = website ||
       (source === "rubbellos" ? "rubbellos.sweetsausallerwelt.de" :
        source === "goldenticket" ? "goldenticket.sweetsausallerwelt.de" :
        source === "newsletter" ? "newsletter.sweetsausallerwelt.de" :
        "sweetsausallerwelt.de");
 
-    const merge_fields = buildMergeFields({
-      firstName,
-      lastName,
-      offer: offer || (source === "hero_dubai_offer" ? "Dubai Schokolade" : "Standard"),
-      source,
-      utm_source,
-      utm_medium,
-      utm_campaign,
-      street,
-      city,
-      postalCode,
-      country
-    });
+    // ========================================
+    // 3. KLAVIYO CUSTOM PROPERTIES
+    // ========================================
+    // Ersetzt die bisherigen Mailchimp-Tags mit Klaviyo-Properties
+    const customProperties = {
+      saaw_source_last: source,
+      saaw_website: detectedWebsite,
+      saaw_newsletter_signup: true,
+      saaw_utm_source: utm_source || '',
+      saaw_utm_medium: utm_medium || '',
+      saaw_utm_campaign: utm_campaign || '',
+    };
 
-    // WEBSITE Merge Field hinzufügen
-    merge_fields.WEBSITE = detectedWebsite;
+    // Offer-Handling
+    const finalOffer = offer || (source === "hero_dubai_offer" || source === "hero_offer" ? "Dubai Schokolade" : "Standard");
+    customProperties.saaw_offer = finalOffer;
 
-    const memberUrl = `https://${DATACENTER}.api.mailchimp.com/3.0/lists/${LIST_ID}/members/${subscriberHash}`;
-
-    // Erstelle den Member mit allen verfügbaren Daten
-    let upsert = await fetch(memberUrl, {
-      method: "PUT",
-      headers: { Authorization: `Basic ${basic}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        email_address: email, 
-        status_if_new: statusIfNew, 
-        merge_fields 
-      }),
-    });
-    
-    const upText = await upsert.text();
-    let mcData = null; 
-    try { 
-      mcData = upText ? JSON.parse(upText) : {}; 
-    } catch {}
-
-    if (!upsert.ok) {
-      const detail = String(mcData?.detail || upText || "").toLowerCase();
-
-      if (upsert.status === 401 || detail.includes("api key")) {
-        return res.status(400).json({ message: "Mailchimp auth failed (API key/datacenter)", mc: mcData || upText });
-      }
-
-      if (detail.includes("compliance") || detail.includes("resubscribe") || detail.includes("pending")) {
-        const retry = await fetch(memberUrl, {
-          method: "PUT",
-          headers: { Authorization: `Basic ${basic}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            email_address: email, 
-            status_if_new: "pending", 
-            status: "pending", 
-            merge_fields 
-          }),
-        });
-        const retryText = await retry.text();
-        let retryData = null; 
-        try { 
-          retryData = retryText ? JSON.parse(retryText) : {}; 
-        } catch {}
-        if (!retry.ok) return res.status(400).json({ message: retryData?.title || "Subscription failed", mc: retryData || retryText });
-        mcData = retryData;
-      } else {
-        return res.status(400).json({ message: mcData?.title || "Subscription failed", mc: mcData || upText });
-      }
-    }
-
-    // Tags basierend auf bereitgestellten Daten erstellen
-    const tags = [
-      { name: "website-signup", status: "active" },
-      { name: source, status: "active" }
-    ];
-
-    // Website-spezifische Tags
-    if (source === "rubbellos" || detectedWebsite.includes("rubbellos")) {
-      tags.push({ name: "site-rubbellos", status: "active" });
-      tags.push({ name: "rubbellos_gewinnspiel", status: "active" });
-      tags.push({ name: "adventskalender_2025", status: "active" });
-    } else if (source === "goldenticket" || detectedWebsite.includes("goldenticket")) {
-      tags.push({ name: "site-goldenticket", status: "active" });
-    } else if (source === "newsletter" || detectedWebsite.includes("newsletter")) {
-      tags.push({ name: "site-newsletter", status: "active" });
-    }
-
+    // Source-spezifische Properties
     if (source === "hero_dubai_offer" || source === "hero_offer") {
-      tags.push({ name: "dubai_chocolate", status: "active" });
+      customProperties.saaw_dubai_chocolate = true;
     }
 
-    if (offer) {
-      tags.push({ name: String(offer).toLowerCase().replace(/\s+/g, "_"), status: "active" });
+    if (source === "rubbellos" || detectedWebsite.includes("rubbellos")) {
+      customProperties.saaw_rubbellos_signup = true;
+      customProperties.saaw_adventskalender_2025 = true;
+    } else if (source === "goldenticket" || detectedWebsite.includes("goldenticket")) {
+      customProperties.saaw_goldenticket_signup = true;
+    } else if (source === "newsletter" || detectedWebsite.includes("newsletter")) {
+      customProperties.saaw_newsletter_page_signup = true;
     }
 
-    // Adress-Tag hinzufügen, wenn Adresse bereitgestellt wurde
-    if (street || city || postalCode) {
-      tags.push({ name: "address_provided", status: "active" });
+    // Code (falls vorhanden)
+    if (code && code.trim()) {
+      customProperties.saaw_code = code.toUpperCase().trim();
     }
 
-    // UTM-basierte Tags
-    if (utm_source) {
-      tags.push({ name: `utm_source_${utm_source}`, status: "active" });
-    }
-    if (utm_campaign) {
-      tags.push({ name: `utm_campaign_${utm_campaign}`, status: "active" });
-    }
+    // ========================================
+    // 4. ADRESSE (optional)
+    // ========================================
+    const address = (street || city || postalCode) ? {
+      street: street || '',
+      city: city || '',
+      postalCode: postalCode || '',
+      country: country || 'DE'
+    } : null;
 
-    const tagsRes = await fetch(`${memberUrl}/tags`, {
-      method: "POST",
-      headers: { Authorization: `Basic ${basic}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ tags }),
-    });
-
-    let tagsWarning;
-    if (!tagsRes.ok) { 
-      try { 
-        tagsWarning = await tagsRes.json(); 
-      } catch { 
-        tagsWarning = { error: "Failed to parse tags response" }; 
-      } 
+    if (address) {
+      customProperties.saaw_address_provided = true;
     }
 
-    // Response erstellen
+    // ========================================
+    // 5. KLAVIYO INTEGRATION
+    // ========================================
+    // Newsletter-Handler: IMMER Newsletter-Abo aktivieren
+    try {
+      const klaviyoResult = await createProfileAndSubscribe({
+        email,
+        firstName: firstName || '',
+        lastName: lastName || '',
+        phone: phone || '',
+        address,
+        customProperties,
+        subscribeNewsletter: true, // Newsletter-Handler → IMMER subscribed
+        listId: process.env.KLAVIYO_MAIN_LIST_ID
+      });
+
+      console.log('✅ Klaviyo Newsletter-Signup erfolgreich:', {
+        email,
+        source,
+        offer: finalOffer,
+        profileId: klaviyoResult.profile?.data?.id
+      });
+
+    } catch (klaviyoError) {
+      console.error('❌ Klaviyo Error:', klaviyoError);
+      return res.status(500).json({
+        message: "Subscription failed",
+        error: klaviyoError.message
+      });
+    }
+
+    // ========================================
+    // 6. SUCCESS RESPONSE
+    // ========================================
     const responseData = {
       message: "Successfully subscribed!",
       email,
       firstName: firstName || undefined,
       lastName: lastName || undefined,
-      offer: source === "hero_dubai_offer" || source === "hero_offer" ? "dubai_chocolate" : "standard",
-      status: statusIfNew,
+      offer: finalOffer,
+      status: "subscribed",
       address_provided: !!(street || city || postalCode),
-      ...(tagsWarning ? { tagsWarning } : {}),
+      klaviyo: "✅"
     };
 
     // Debug-Info für Entwicklung
     if (process.env.NODE_ENV === "development") {
       responseData.debug = {
-        merge_fields,
-        tags: tags.map(t => t.name),
-        subscriber_hash: subscriberHash
+        customProperties,
+        website: detectedWebsite,
+        source
       };
     }
 
     return res.status(200).json(responseData);
-    
+
   } catch (err) {
     console.error("Newsletter signup error:", err);
-    return res.status(500).json({ 
-      message: "Subscription failed", 
+    return res.status(500).json({
+      message: "Subscription failed",
       error: process.env.NODE_ENV === "development" ? err.message : "Internal server error"
     });
   }

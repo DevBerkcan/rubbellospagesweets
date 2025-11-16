@@ -15,6 +15,7 @@ export default function GoldenTicketForm() {
   const [consent, setConsent] = useState(false);
   const [consentError, setConsentError] = useState("");
   const [newsletterError, setNewsletterError] = useState("");
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "", lastName: "", email: "", phone: "",
@@ -94,8 +95,8 @@ export default function GoldenTicketForm() {
     e.preventDefault();
     const code = ticketCode.trim().toUpperCase();
 
-    if (!/^[A-Z0-9]{8}$/.test(code)) {
-      alert("Bitte gib einen gültigen 8-stelligen Code ein (nur Buchstaben und Zahlen)");
+    if (!/^[A-Z0-9]{5}$/.test(code)) {
+      alert("Bitte gib einen gültigen 5-stelligen Code ein (nur Buchstaben und Zahlen)");
       return;
     }
 
@@ -304,13 +305,119 @@ export default function GoldenTicketForm() {
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="space-y-2 max-w-3xl mx-auto">
               <p className="text-lg md:text-xl text-gray-800 font-bold leading-relaxed">
-                Gib deinen 8-stelligen Code ein und <span className="text-red-600">🎅 erfahre welche Gewinne hinter deinem Rubbellos stecken ✨</span>
+                Gib deinen 5-stelligen Code ein und <span className="text-red-600">🎅 erfahre welche Gewinne hinter deinem Rubbellos stecken ✨</span>
               </p>
               <div className="inline-block bg-gradient-to-r from-red-500 to-green-500 text-white px-6 py-2 rounded-full shadow-lg">
                 <span className="font-bold text-base">🎄 Adventskalender-Gewinnspiel 2025 🎁</span>
               </div>
             </motion.div>
           </div>
+
+          {/* WIE FUNKTIONIERT'S - Aufklappbare Anleitung */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="bg-white/30 backdrop-blur-lg rounded-2xl shadow-lg border border-white/40 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowInstructions(!showInstructions)}
+                className="w-full px-4 md:px-6 py-3 md:py-4 flex items-center justify-between text-left hover:bg-white/20 transition-colors"
+              >
+                <div className="flex-1">
+                  <h3 className="text-base md:text-lg font-bold text-gray-900 mb-1">
+                    🎉 So funktioniert dein „Sweets aus aller Welt" Rubbel-Los
+                  </h3>
+                  <p className="text-xs md:text-sm text-gray-700">
+                    Rubbel die gekennzeichnete Fläche auf deinem Los vorsichtig frei...
+                  </p>
+                </div>
+                <ChevronRight
+                  className={`w-5 h-5 md:w-6 md:h-6 text-gray-700 transition-transform flex-shrink-0 ml-2 ${
+                    showInstructions ? 'rotate-90' : ''
+                  }`}
+                />
+              </button>
+
+              {showInstructions && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="px-4 md:px-6 pb-4 md:pb-5 bg-white/10"
+                >
+                  <div className="space-y-4 text-left">
+                    {/* Schritt 1 */}
+                    <div className="flex gap-3 md:gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white flex items-center justify-center font-bold text-sm md:text-base">
+                        1
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-sm md:text-base mb-1">Feld freirubbeln</h4>
+                        <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
+                          Rubbel die gekennzeichnete Fläche auf deinem Los vorsichtig frei und schau dir die Emojis an.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Schritt 2 */}
+                    <div className="flex gap-3 md:gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white flex items-center justify-center font-bold text-sm md:text-base">
+                        2
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-sm md:text-base mb-1">Auf 3 gleiche Emojis achten</h4>
+                        <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
+                          Hast du 3 gleiche Emojis in der Gewinnzone aufgedeckt (z. B. in einer Reihe / in einem Feld, wie auf dem Los beschrieben)?
+                          <span className="font-semibold text-green-700"> 👉 Dann hast du einen Gewinn!</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Schritt 3 */}
+                    <div className="flex gap-3 md:gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white flex items-center justify-center font-bold text-sm md:text-base">
+                        3
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-sm md:text-base mb-1">Gewinn prüfen & einlösen</h4>
+                        <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
+                          Auf deinem Rubbel-Los steht, welcher Gewinn zu deiner Emoji-Kombination gehört (z. B. Süßigkeiten-Box, Schokolade, Rabattcode) und wie du ihn einlöst – zum Beispiel: QR-Code scannen oder Foto deines Loses machen und nach Anleitung einsenden.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Schritt 4 */}
+                    <div className="flex gap-3 md:gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white flex items-center justify-center font-bold text-sm md:text-base">
+                        4
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-sm md:text-base mb-1">Süßigkeiten sichern 😋</h4>
+                        <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
+                          Wir prüfen deinen Gewinn und melden uns bei dir, damit deine Überraschung so schnell wie möglich bei dir ankommt.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Legal Notice */}
+                    <div className="pt-3 border-t border-gray-300">
+                      <p className="text-[10px] md:text-xs text-gray-600 text-center">
+                        Es gelten die{" "}
+                        <a href="/teilnahmebedingungen" target="_blank" className="underline text-red-700 font-semibold hover:text-red-800">
+                          Teilnahmebedingungen für Rubbel-Lose
+                        </a>
+                        .
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
 
           {/* FORM */}
           <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="max-w-2xl mx-auto">
@@ -344,13 +451,13 @@ export default function GoldenTicketForm() {
                           <Ticket className="mx-auto text-red-600 w-6 h-6 md:w-8 md:h-8 mb-2" />
                           <input
                             type="text"
-                            placeholder="????????"
+                            placeholder="?????"
                             value={ticketCode}
                             onChange={(e) => setTicketCode(e.target.value.toUpperCase())}
-                            maxLength={8}
+                            maxLength={5}
                             className="w-full px-2 md:px-4 py-3 md:py-4 text-xl md:text-2xl lg:text-3xl font-black text-center text-red-600 bg-gradient-to-r from-yellow-50 to-red-50 border-2 md:border-4 border-red-500 rounded-xl focus:border-green-500 focus:ring-2 md:focus:ring-4 focus:ring-green-300 focus:outline-none placeholder:text-gray-400 placeholder:font-bold tracking-[0.3em] md:tracking-[0.5em] shadow-inner"
                           />
-                          <p className="text-[10px] md:text-xs text-gray-600 mt-2 font-semibold px-2">8-stelliger Code (Groß-/Kleinschreibung egal)</p>
+                          <p className="text-[10px] md:text-xs text-gray-600 mt-2 font-semibold px-2">5-stelliger Code (Groß-/Kleinschreibung egal)</p>
                         </div>
                       </div>
                     </div>

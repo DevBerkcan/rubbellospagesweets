@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ChevronRight, Gift } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
@@ -14,6 +14,7 @@ export default function ChristmasGiveawayForm() {
   const [consentError, setConsentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [ticketCode, setTicketCode] = useState("");
+  const [showInstructions, setShowInstructions] = useState(false);
   const submittedRef = useRef(false);
 
   const contactForm = useForm({ mode: "onSubmit", reValidateMode: "onBlur" });
@@ -51,10 +52,10 @@ export default function ChristmasGiveawayForm() {
       return;
     }
 
-    if (!data.ticketCode || !/^[A-Z0-9]{8}$/.test(data.ticketCode)) {
+    if (!data.ticketCode || !/^[A-Z0-9]{5}$/.test(data.ticketCode)) {
       contactForm.setError("ticketCode", {
         type: "manual",
-        message: "Bitte gib einen gültigen 8-stelligen Code ein",
+        message: "Bitte gib einen gültigen 5-stelligen Code ein",
       });
       return;
     }
@@ -94,8 +95,8 @@ export default function ChristmasGiveawayForm() {
         errorMessage = "❌ Dieser Code wurde bereits eingelöst. Bitte verwende einen anderen Code.";
       } else if (error.message.includes("bereits teilgenommen") || error.message.includes("EMAIL_ALREADY_PARTICIPATED")) {
         errorMessage = "❌ Du hast bereits mit dieser E-Mail Adresse teilgenommen. Pro E-Mail ist nur eine Teilnahme möglich.";
-      } else if (error.message.includes("gültigen 8-stelligen Code")) {
-        errorMessage = "❌ Bitte gib einen gültigen 8-stelligen Code ein (nur Buchstaben und Zahlen).";
+      } else if (error.message.includes("gültigen 5-stelligen Code")) {
+        errorMessage = "❌ Bitte gib einen gültigen 5-stelligen Code ein (nur Buchstaben und Zahlen).";
       } else {
         errorMessage = error.message || errorMessage;
       }
@@ -159,7 +160,7 @@ export default function ChristmasGiveawayForm() {
 
             {/* Heading */}
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-4 bg-gradient-to-r from-red-600 via-green-600 to-red-600 bg-clip-text text-transparent">
-              TEILNAHME BESTÄTIGT!
+              VIELEN DANK FÜR DEINE TEILNAHME!
             </h1>
 
             {/* Code Display */}
@@ -173,21 +174,42 @@ export default function ChristmasGiveawayForm() {
               <p className="text-xs text-center text-gray-500 mt-2">🎫✨</p>
             </div>
 
-            {/* Info Box */}
-            <div className="bg-gradient-to-br from-red-50 to-green-50 rounded-xl p-4 mb-4 space-y-3 border border-red-100">
-              <p className="text-sm text-gray-700 text-center">
-                {newsletterOptIn
-                  ? "📧 Bitte bestätige deine Newsletter-Anmeldung in der E-Mail."
-                  : "✅ Deine Teilnahme wurde gespeichert!"}
-              </p>
-              <p className="text-xs text-gray-600 text-center">
-                🎅 Der Gewinner wird nach Ende des Teilnahmezeitraums (24.12.2025) per E-Mail benachrichtigt.
-              </p>
-              {newsletterOptIn && (
-                <p className="text-xs text-gray-500 text-center">
-                  💡 Falls keine E-Mail kommt: Spam-Ordner prüfen.
+            {/* Hauptnachricht - LOS TOPF */}
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-5 mb-4 border-2 border-amber-300 shadow-lg">
+              <div className="text-center mb-3">
+                <p className="text-2xl md:text-3xl font-bold mb-2">🎁🎉</p>
+                <h2 className="text-lg md:text-xl font-black text-amber-900 mb-2">
+                  Du bist jetzt im Täglichen LOS TOPF!
+                </h2>
+                <p className="text-sm md:text-base text-gray-700 font-semibold">
+                  Wir verlosen jeden Monat Sweetsboxen!
                 </p>
+              </div>
+            </div>
+
+            {/* Info Boxen */}
+            <div className="space-y-3 mb-4">
+              {/* Newsletter Opt-in Info */}
+              {newsletterOptIn && (
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                  <p className="text-sm text-gray-700 text-center font-medium">
+                    📧 Bitte bestätige deine E-Mail für den Newsletter-Zugang
+                  </p>
+                  <p className="text-xs text-gray-500 text-center mt-2">
+                    💡 Falls keine E-Mail kommt: Spam-Ordner prüfen
+                  </p>
+                </div>
               )}
+
+              {/* Gewinner Benachrichtigung */}
+              <div className="bg-gradient-to-br from-red-50 to-green-50 rounded-xl p-4 border border-red-200">
+                <p className="text-sm text-gray-700 text-center">
+                  🎅 Wir melden uns bei dir, wenn du gewonnen hast!
+                </p>
+                <p className="text-xs text-gray-500 text-center mt-1">
+                  Gewinner werden per E-Mail benachrichtigt
+                </p>
+              </div>
             </div>
 
             {/* Shop Button */}
@@ -252,7 +274,9 @@ export default function ChristmasGiveawayForm() {
         />
       </div>
 
-      <div className="container mx-auto relative z-10 max-w-sm md:max-w-md">
+      <div className="container mx-auto relative z-10 max-w-sm md:max-w-md space-y-4">
+      
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -269,29 +293,32 @@ export default function ChristmasGiveawayForm() {
               <h2 className="hidden md:block text-white text-center text-lg font-semibold mb-3 drop-shadow-lg">
                 Gib hier deinen Code ein
               </h2>
-              <div className="bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-600 rounded-[32px] p-[2px] shadow-xl md:rounded-3xl">
-                <div className="bg-sky-900/40 rounded-[30px] px-5 py-3 flex items-center justify-center gap-2 md:px-6 md:py-4">
-                  <Gift className="w-4 h-4 text-white/80 md:w-5 md:h-5" />
+              <div className={`bg-gradient-to-r rounded-[32px] p-[2px] shadow-xl md:rounded-3xl ${
+                contactForm.formState.errors.ticketCode
+                  ? 'from-red-500 via-red-400 to-red-600'
+                  : 'from-sky-500 via-cyan-400 to-blue-600'
+              }`}>
+                <div className="bg-sky-900/40 rounded-[30px] px-5 py-3 flex items-center justify-center md:px-6 md:py-4">
                   <input
                     type="text"
-                    placeholder="••••••••"
+                    placeholder="ABCDE"
                     {...contactForm.register("ticketCode", {
                       required: "Code ist erforderlich",
                       pattern: {
-                        value: /^[A-Z0-9]{8}$/,
+                        value: /^[A-Z0-9]{5}$/,
                         message:
-                          "Bitte gib einen gültigen 8-stelligen Code ein",
+                          "Bitte gib einen gültigen 5-stelligen Code ein",
                       },
                     })}
-                    maxLength={8}
+                    maxLength={5}
                     className="w-full bg-transparent border-none outline-none text-center text-lg tracking-[0.4em] text-white font-semibold placeholder:text-white/60 uppercase md:text-xl"
                     style={{ letterSpacing: "0.4em" }}
                   />
                 </div>
               </div>
               {contactForm.formState.errors.ticketCode && (
-                <p className="text-red-300 text-[11px] mt-1 text-center font-medium md:text-sm">
-                  {String(contactForm.formState.errors.ticketCode.message)}
+                <p className="text-red-200 bg-red-900/50 rounded-lg px-3 py-1.5 text-[11px] mt-2 text-center font-medium md:text-sm backdrop-blur-sm border border-red-400/30">
+                  ⚠️ {String(contactForm.formState.errors.ticketCode.message)}
                 </p>
               )}
             </div>
@@ -306,11 +333,15 @@ export default function ChristmasGiveawayForm() {
                     required: "Vorname ist erforderlich",
                     minLength: { value: 2, message: "Mindestens 2 Zeichen" },
                   })}
-                  className="w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md border border-white/40 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400 md:px-5 md:py-3 md:text-sm"
+                  className={`w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 md:px-5 md:py-3 md:text-sm ${
+                    contactForm.formState.errors.firstName
+                      ? 'border-2 border-red-500 focus:ring-red-400'
+                      : 'border border-white/40 focus:ring-amber-400'
+                  }`}
                 />
                 {contactForm.formState.errors.firstName && (
-                  <p className="text-red-300 text-[11px] mt-1 text-left md:text-xs">
-                    {String(contactForm.formState.errors.firstName.message)}
+                  <p className="text-red-200 bg-red-900/50 rounded-lg px-2 py-1 text-[10px] mt-1 text-left md:text-xs backdrop-blur-sm border border-red-400/30">
+                    ⚠️ {String(contactForm.formState.errors.firstName.message)}
                   </p>
                 )}
               </div>
@@ -322,11 +353,15 @@ export default function ChristmasGiveawayForm() {
                     required: "Nachname ist erforderlich",
                     minLength: { value: 2, message: "Mindestens 2 Zeichen" },
                   })}
-                  className="w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md border border-white/40 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400 md:px-5 md:py-3 md:text-sm"
+                  className={`w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 md:px-5 md:py-3 md:text-sm ${
+                    contactForm.formState.errors.lastName
+                      ? 'border-2 border-red-500 focus:ring-red-400'
+                      : 'border border-white/40 focus:ring-amber-400'
+                  }`}
                 />
                 {contactForm.formState.errors.lastName && (
-                  <p className="text-red-300 text-[11px] mt-1 text-left md:text-xs">
-                    {String(contactForm.formState.errors.lastName.message)}
+                  <p className="text-red-200 bg-red-900/50 rounded-lg px-2 py-1 text-[10px] mt-1 text-left md:text-xs backdrop-blur-sm border border-red-400/30">
+                    ⚠️ {String(contactForm.formState.errors.lastName.message)}
                   </p>
                 )}
               </div>
@@ -346,11 +381,15 @@ export default function ChristmasGiveawayForm() {
                         "Bitte gib eine gültige E-Mail Adresse ein",
                     },
                   })}
-                  className="w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md border border-white/40 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400 md:px-5 md:py-3 md:text-sm"
+                  className={`w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 md:px-5 md:py-3 md:text-sm ${
+                    contactForm.formState.errors.email
+                      ? 'border-2 border-red-500 focus:ring-red-400'
+                      : 'border border-white/40 focus:ring-amber-400'
+                  }`}
                 />
                 {contactForm.formState.errors.email && (
-                  <p className="text-red-300 text-[11px] mt-1 text-left md:text-xs">
-                    {String(contactForm.formState.errors.email.message)}
+                  <p className="text-red-200 bg-red-900/50 rounded-lg px-2 py-1 text-[10px] mt-1 text-left md:text-xs backdrop-blur-sm border border-red-400/30">
+                    ⚠️ {String(contactForm.formState.errors.email.message)}
                   </p>
                 )}
               </div>
@@ -358,9 +397,23 @@ export default function ChristmasGiveawayForm() {
                 <input
                   type="tel"
                   placeholder="+49 151 23456789"
-                  {...contactForm.register("phone")}
-                  className="w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md border border-white/40 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400 md:px-5 md:py-3 md:text-sm"
+                  {...contactForm.register("phone", {
+                    pattern: {
+                      value: /^[\d\s\+\-\(\)]+$/,
+                      message: "Nur Zahlen und +()-",
+                    },
+                  })}
+                  className={`w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 md:px-5 md:py-3 md:text-sm ${
+                    contactForm.formState.errors.phone
+                      ? 'border-2 border-red-500 focus:ring-red-400'
+                      : 'border border-white/40 focus:ring-amber-400'
+                  }`}
                 />
+                {contactForm.formState.errors.phone && (
+                  <p className="text-red-200 bg-red-900/50 rounded-lg px-2 py-1 text-[10px] mt-1 text-left md:text-xs backdrop-blur-sm border border-red-400/30">
+                    ⚠️ {String(contactForm.formState.errors.phone.message)}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -448,8 +501,8 @@ export default function ChristmasGiveawayForm() {
               </span>
             </label>
             {consentError && (
-              <p className="text-red-300 text-[10px] -mt-1 font-medium md:text-xs">
-                {consentError}
+              <p className="text-red-200 bg-red-900/50 rounded-lg px-3 py-1.5 text-[10px] -mt-1 font-medium md:text-xs backdrop-blur-sm border border-red-400/30">
+                ⚠️ {consentError}
               </p>
             )}
 
@@ -524,6 +577,111 @@ export default function ChristmasGiveawayForm() {
               </p>
             </div>
           </form>
+        </motion.div>
+        {/* WIE FUNKTIONIERT'S - Aufklappbare Anleitung */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full"
+        >
+          <div className="bg-white/30 backdrop-blur-lg rounded-2xl shadow-lg border border-white/40 overflow-hidden md:bg-white/20">
+            <button
+              type="button"
+              onClick={() => setShowInstructions(!showInstructions)}
+              className="w-full px-3 md:px-5 py-2.5 md:py-3 flex items-center justify-between text-left hover:bg-white/20 transition-colors"
+            >
+              <div className="flex-1 pr-2">
+                <h3 className="text-sm md:text-base font-bold text-white mb-0.5 drop-shadow-md">
+                  🎉 So funktioniert dein Rubbel-Los
+                </h3>
+                <p className="text-[10px] md:text-xs text-white/90 drop-shadow-sm">
+                  Rubbel die gekennzeichnete Fläche frei...
+                </p>
+              </div>
+              <ChevronRight
+                className={`w-4 h-4 md:w-5 md:h-5 text-white drop-shadow-md transition-transform flex-shrink-0 ${
+                  showInstructions ? 'rotate-90' : ''
+                }`}
+              />
+            </button>
+
+            {showInstructions && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="px-3 md:px-5 pb-3 md:pb-4 bg-white/10 backdrop-blur-sm"
+              >
+                <div className="space-y-3 text-left">
+                  {/* Schritt 1 */}
+                  <div className="flex gap-2 md:gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white flex items-center justify-center font-bold text-xs md:text-sm">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-white text-xs md:text-sm mb-0.5 drop-shadow-md">Feld freirubbeln</h4>
+                      <p className="text-[10px] md:text-xs text-white/90 leading-relaxed drop-shadow-sm">
+                        Rubbel die gekennzeichnete Fläche auf deinem Los vorsichtig frei und schau dir die Emojis an.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Schritt 2 */}
+                  <div className="flex gap-2 md:gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white flex items-center justify-center font-bold text-xs md:text-sm">
+                      2
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-white text-xs md:text-sm mb-0.5 drop-shadow-md">Auf 3 gleiche Emojis achten</h4>
+                      <p className="text-[10px] md:text-xs text-white/90 leading-relaxed drop-shadow-sm">
+                        Hast du 3 gleiche Emojis in der Gewinnzone aufgedeckt?
+                        <span className="font-semibold text-green-300"> 👉 Dann hast du einen Gewinn!</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Schritt 3 */}
+                  <div className="flex gap-2 md:gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white flex items-center justify-center font-bold text-xs md:text-sm">
+                      3
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-white text-xs md:text-sm mb-0.5 drop-shadow-md">Gewinn prüfen & einlösen</h4>
+                      <p className="text-[10px] md:text-xs text-white/90 leading-relaxed drop-shadow-sm">
+                        Auf deinem Los steht, welcher Gewinn zu deiner Emoji-Kombination gehört und wie du ihn einlöst.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Schritt 4 */}
+                  <div className="flex gap-2 md:gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white flex items-center justify-center font-bold text-xs md:text-sm">
+                      4
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-white text-xs md:text-sm mb-0.5 drop-shadow-md">Süßigkeiten sichern 😋</h4>
+                      <p className="text-[10px] md:text-xs text-white/90 leading-relaxed drop-shadow-sm">
+                        Wir prüfen deinen Gewinn und melden uns bei dir!
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Legal Notice */}
+                  <div className="pt-2 border-t border-white/20">
+                    <p className="text-[9px] md:text-[10px] text-white/80 text-center drop-shadow-sm">
+                      Es gelten die{" "}
+                      <a href="/teilnahmebedingungen" target="_blank" className="underline text-amber-300 font-semibold hover:text-amber-200">
+                        Teilnahmebedingungen
+                      </a>
+                      .
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
         </motion.div>
       </div>
     </div>
