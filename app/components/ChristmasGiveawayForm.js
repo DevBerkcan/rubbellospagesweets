@@ -52,10 +52,10 @@ export default function ChristmasGiveawayForm() {
       return;
     }
 
-    if (!data.ticketCode || !/^[A-Z0-9]{5}$/.test(data.ticketCode)) {
+    if (!data.ticketCode || data.ticketCode.trim().length !== 5) {
       contactForm.setError("ticketCode", {
         type: "manual",
-        message: "Bitte gib einen gültigen 5-stelligen Code ein",
+        message: "Der Code muss genau 5 Zeichen haben",
       });
       return;
     }
@@ -304,10 +304,9 @@ export default function ChristmasGiveawayForm() {
                     placeholder="ABCDE"
                     {...contactForm.register("ticketCode", {
                       required: "Code ist erforderlich",
-                      pattern: {
-                        value: /^[A-Z0-9]{5}$/,
-                        message:
-                          "Bitte gib einen gültigen 5-stelligen Code ein",
+                      minLength: {
+                        value: 5,
+                        message: "Der Code muss genau 5 Zeichen haben",
                       },
                     })}
                     maxLength={5}
