@@ -174,19 +174,6 @@ export default function ChristmasGiveawayForm() {
               <p className="text-xs text-center text-gray-500 mt-2">🎫✨</p>
             </div>
 
-            {/* Hauptnachricht - LOS TOPF */}
-            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-5 mb-4 border-2 border-amber-300 shadow-lg">
-              <div className="text-center mb-3">
-                <p className="text-2xl md:text-3xl font-bold mb-2">🎁🎉</p>
-                <h2 className="text-lg md:text-xl font-black text-amber-900 mb-2">
-                  Du bist jetzt im Täglichen LOS TOPF!
-                </h2>
-                <p className="text-sm md:text-base text-gray-700 font-semibold">
-                  Wir verlosen jeden Monat Sweetsboxen!
-                </p>
-              </div>
-            </div>
-
             {/* Info Boxen */}
             <div className="space-y-3 mb-4">
               {/* Newsletter Opt-in Info */}
