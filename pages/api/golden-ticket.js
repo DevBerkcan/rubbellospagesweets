@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     // Hauptproperty: rubbellos_eintragung (trigger für Bestätigungs-Email)
     const customProperties = {
       rubbellos_eintragung: true,              // ← Trigger für "Gewinn wird geprüft" Mail
-      rubbellos_code: ticketCode,              // 5-stelliger Code
+      // rubbellos_code und rubbellos_codes werden automatisch von upsertProfile gesetzt
       rubbellos_newsletter_optin: newsletterOptIn, // Newsletter-Status
       rubbellos_utm_source: utm_source || '',
       rubbellos_utm_medium: utm_medium || '',
@@ -88,7 +88,8 @@ export default async function handler(req, res) {
         address,                   // ← Adresse wird übertragen (falls angegeben)
         customProperties,          // ← Enthält: rubbellos_eintragung, rubbellos_code, etc.
         subscribeNewsletter: true, // ← IMMER zur Liste hinzufügen!
-        listId: process.env.KLAVIYO_MAIN_LIST_ID
+        listId: process.env.KLAVIYO_MAIN_LIST_ID,
+        newCode: ticketCode        // ← Code wird zum Array rubbellos_codes hinzugefügt
       });
 
       console.log('✅ Klaviyo Integration erfolgreich:', {
