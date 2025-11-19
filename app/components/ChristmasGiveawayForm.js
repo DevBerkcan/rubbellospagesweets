@@ -24,7 +24,7 @@ export default function ChristmasGiveawayForm() {
     return new URLSearchParams(window.location.search).get(param);
   };
 
-  const callGoldenTicketAPI = async (data) => {
+  const callRubbellosAPI = async (data) => {
     return fetch("/api/golden-ticket", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -65,7 +65,7 @@ export default function ChristmasGiveawayForm() {
     try {
       submittedRef.current = true;
 
-      const res = await callGoldenTicketAPI({
+      const res = await callRubbellosAPI({
         ticketCode: data.ticketCode.toUpperCase(),
         email: data.email,
         firstName: data.firstName,
@@ -87,7 +87,7 @@ export default function ChristmasGiveawayForm() {
       setStep("done");
       submittedRef.current = false;
     } catch (error) {
-      console.error("Golden Ticket error:", error);
+      console.error("Rubbellos error:", error);
 
       // Einfache Fehlermeldung
       const errorMessage = error.message || "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";

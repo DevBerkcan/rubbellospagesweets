@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     // ========================================
     // 5. SUCCESS RESPONSE
     // ========================================
-    console.log("✅ Golden Ticket Teilnahme gespeichert:", {
+    console.log("✅ Rubbellos Teilnahme gespeichert:", {
       email,
       ticketCode,
       newsletter: newsletterOptIn ? "DOI aktiviert" : "nicht aktiviert",
@@ -137,7 +137,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Golden Ticket API Error:", error);
+    console.error("Rubbellos API Error:", error);
     return res.status(500).json({
       message: "Interner Server-Fehler",
       error: error.message
