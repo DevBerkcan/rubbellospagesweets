@@ -384,10 +384,19 @@ export default function ChristmasGiveawayForm() {
                   type="tel"
                   placeholder="+49 151 23456789"
                   {...contactForm.register("phone", {
-                    pattern: {
-                      value: /^[\d\s\+\-\(\)]+$/,
-                      message: "Nur Zahlen und +()-",
-                    },
+                    validate: {
+                      validFormat: (value) => {
+                        // Leeres Feld ist okay (optional)
+                        if (!value || value.trim() === '') return true;
+
+                        // Erlaube alle gängigen Telefonnummern-Formate:
+                        // 0188237983, 0175 47892390, +49 3682937892, etc.
+                        const phoneRegex = /^[\d\s\+\-\(\)\/\.]+$/;
+                        const hasDigits = /\d/.test(value);
+
+                        return (phoneRegex.test(value) && hasDigits) || "Ungültiges Telefonnummer-Format";
+                      }
+                    }
                   })}
                   className={`w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 md:px-5 md:py-3 md:text-sm ${
                     contactForm.formState.errors.phone

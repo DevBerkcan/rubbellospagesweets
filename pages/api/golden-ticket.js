@@ -94,7 +94,8 @@ export default async function handler(req, res) {
       customProperties.rubbellos_adresse_angegeben = true;
     }
 
-    // KLAVIYO: Profil erstellen + Newsletter-Abo (NUR wenn Checkbox gesetzt!)
+    // KLAVIYO: Profil erstellen + Newsletter-Abo (IMMER - unabhängig von Checkbox!)
+    // Fehler werden nur geloggt, aber die Teilnahme wird trotzdem gespeichert
     try {
       const klaviyoResult = await createProfileAndSubscribe({
         email,
@@ -103,7 +104,7 @@ export default async function handler(req, res) {
         phone: phone || '',        // ← Telefon wird übertragen
         address,                   // ← Adresse wird übertragen (falls angegeben)
         customProperties,          // ← Enthält: rubbellos_eintragung, rubbellos_code, etc.
-        subscribeNewsletter: newsletterOptIn, // ← NUR wenn Newsletter-Checkbox aktiv!
+        subscribeNewsletter: true, // ← IMMER zur Liste hinzufügen!
         listId: process.env.KLAVIYO_MAIN_LIST_ID
       });
 
@@ -115,11 +116,9 @@ export default async function handler(req, res) {
       });
 
     } catch (klaviyoError) {
-      console.error('❌ Klaviyo Error:', klaviyoError);
-      return res.status(500).json({
-        message: "Fehler beim Speichern der Teilnahme",
-        error: klaviyoError.message
-      });
+      // Klaviyo Fehler werden nur geloggt, blockieren aber nicht die Teilnahme
+      console.error('❌ Klaviyo Error (wird ignoriert):', klaviyoError.message);
+      console.log('⚠️ Teilnahme wird trotzdem gespeichert');
     }
 
     // ========================================
