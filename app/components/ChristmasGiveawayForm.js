@@ -52,6 +52,7 @@ export default function ChristmasGiveawayForm() {
       return;
     }
 
+    // Nur Code-Länge prüfen (muss genau 5 Zeichen sein)
     if (!data.ticketCode || data.ticketCode.trim().length !== 5) {
       contactForm.setError("ticketCode", {
         type: "manual",
@@ -88,18 +89,8 @@ export default function ChristmasGiveawayForm() {
     } catch (error) {
       console.error("Golden Ticket error:", error);
 
-      // Bessere Fehlermeldungen für spezifische Fehler
-      let errorMessage = "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
-
-      if (error.message.includes("bereits eingelöst") || error.message.includes("CODE_ALREADY_USED")) {
-        errorMessage = "❌ Dieser Code wurde bereits eingelöst. Bitte verwende einen anderen Code.";
-      } else if (error.message.includes("bereits teilgenommen") || error.message.includes("EMAIL_ALREADY_PARTICIPATED")) {
-        errorMessage = "❌ Du hast bereits mit dieser E-Mail Adresse teilgenommen. Pro E-Mail ist nur eine Teilnahme möglich.";
-      } else if (error.message.includes("gültigen 5-stelligen Code")) {
-        errorMessage = "❌ Bitte gib einen gültigen 5-stelligen Code ein (nur Buchstaben und Zahlen).";
-      } else {
-        errorMessage = error.message || errorMessage;
-      }
+      // Einfache Fehlermeldung
+      const errorMessage = error.message || "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
 
       alert(errorMessage);
       submittedRef.current = false;
@@ -295,6 +286,10 @@ export default function ChristmasGiveawayForm() {
                         value: 5,
                         message: "Der Code muss genau 5 Zeichen haben",
                       },
+                      maxLength: {
+                        value: 5,
+                        message: "Der Code muss genau 5 Zeichen haben",
+                      },
                     })}
                     maxLength={5}
                     className="w-full bg-transparent border-none outline-none text-center text-lg tracking-[0.4em] text-white font-semibold placeholder:text-white/60 uppercase md:text-xl"
@@ -363,8 +358,7 @@ export default function ChristmasGiveawayForm() {
                     required: "E-Mail ist erforderlich",
                     pattern: {
                       value: /\S+@\S+\.\S+/,
-                      message:
-                        "Bitte gib eine gültige E-Mail Adresse ein",
+                      message: "Bitte gib eine gültige E-Mail Adresse ein",
                     },
                   })}
                   className={`w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 md:px-5 md:py-3 md:text-sm ${
@@ -383,32 +377,9 @@ export default function ChristmasGiveawayForm() {
                 <input
                   type="tel"
                   placeholder="+49 151 23456789"
-                  {...contactForm.register("phone", {
-                    validate: {
-                      validFormat: (value) => {
-                        // Leeres Feld ist okay (optional)
-                        if (!value || value.trim() === '') return true;
-
-                        // Erlaube alle gängigen Telefonnummern-Formate:
-                        // 0188237983, 0175 47892390, +49 3682937892, etc.
-                        const phoneRegex = /^[\d\s\+\-\(\)\/\.]+$/;
-                        const hasDigits = /\d/.test(value);
-
-                        return (phoneRegex.test(value) && hasDigits) || "Ungültiges Telefonnummer-Format";
-                      }
-                    }
-                  })}
-                  className={`w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 md:px-5 md:py-3 md:text-sm ${
-                    contactForm.formState.errors.phone
-                      ? 'border-2 border-red-500 focus:ring-red-400'
-                      : 'border border-white/40 focus:ring-amber-400'
-                  }`}
+                  {...contactForm.register("phone")}
+                  className="w-full px-4 py-2 rounded-full bg-white/95 text-gray-900 text-xs shadow-md placeholder:text-gray-500 focus:outline-none focus:ring-2 border border-white/40 focus:ring-amber-400 md:px-5 md:py-3 md:text-sm"
                 />
-                {contactForm.formState.errors.phone && (
-                  <p className="text-red-200 bg-red-900/50 rounded-lg px-2 py-1 text-[10px] mt-1 text-left md:text-xs backdrop-blur-sm border border-red-400/30">
-                    ⚠️ {String(contactForm.formState.errors.phone.message)}
-                  </p>
-                )}
               </div>
             </div>
 

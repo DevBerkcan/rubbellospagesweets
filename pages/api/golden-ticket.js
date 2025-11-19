@@ -1,7 +1,7 @@
 // pages/api/golden-ticket.js
 // Rubbellos-Gewinnspiel Handler mit KLAVIYO Integration
 
-import { validateSubmission, markCodeAsUsed } from "../../lib/codeValidator";
+import { markCodeAsUsed } from "../../lib/codeValidator";
 import { createProfileAndSubscribe } from "../../lib/klaviyo";
 
 export default async function handler(req, res) {
@@ -31,27 +31,10 @@ export default async function handler(req, res) {
     } = data;
 
     // ========================================
-    // 1. VALIDIERUNG
+    // VALIDIERUNG: Nur Code-Länge prüfen
     // ========================================
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      return res.status(400).json({ message: "Gültige E-Mail erforderlich" });
-    }
-
-    if (!ticketCode || !/^[A-Z0-9]{5}$/.test(ticketCode)) {
-      return res.status(400).json({ message: "Gültiger 5-stelliger Code erforderlich" });
-    }
-
-    // ========================================
-    // 2. DUPLIKAT-PRÄVENTION
-    // ========================================
-    const validationResult = validateSubmission(ticketCode, email, utm_campaign || "rubbellos_2025");
-    if (!validationResult.valid) {
-      console.warn(`❌ Duplikat erkannt: ${validationResult.error}`, { ticketCode, email });
-      return res.status(400).json({
-        message: validationResult.message,
-        error: validationResult.error,
-        ...validationResult.data
-      });
+    if (!ticketCode || ticketCode.trim().length !== 5) {
+      return res.status(400).json({ message: "Der Code muss genau 5 Zeichen haben" });
     }
 
     // ========================================
